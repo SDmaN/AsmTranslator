@@ -4,6 +4,7 @@
 #include <memory>
 #include "CommandData.h"
 #include "../TypeDefines.h"
+#include "../VmExecutable.h"
 
 class Command;
 
@@ -11,7 +12,6 @@ typedef std::shared_ptr<Command> CommandPointer;
 
 class LabelContainer;
 class ErrorContainer;
-class VmExecutable;
 
 // Абстрактный класс команды процессора или ассемблера
 class Command
@@ -19,8 +19,9 @@ class Command
 public:
     Command(const CommandData &data, Address address, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
+    virtual bool hasError() const = 0; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды
-    virtual bool translate(VmExecutable &vmExec) = 0; // Транслирует команду в машинный код
+    virtual VmExecutable translate() = 0; // Транслирует команду в машинный код
 
 protected:
     LabelContainer *labelContainer() const;
