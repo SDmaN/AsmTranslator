@@ -52,9 +52,12 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
         CommandPointer command = createCommand(cmdData, currentCommandAddress);
 
         if(command)
-            currentCommandAddress += command->size();
-        else
         {
+            currentCommandAddress += command->size();
+            hasError = command->hasError(); // Сама ошибка обработана командой
+        }
+        else
+        { // Нашли неверную команду
             hasError = true;
             handleError(cmdData, CompillerError::CommandNotFound);
         }
