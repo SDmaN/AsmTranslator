@@ -20,7 +20,7 @@ class ErrorContainer;
 class Command
 {
 public:
-    Command(const CommandData &data, Address address, LabelContainer *labelContainer, ErrorContainer *errorContainer);
+    Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
     virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды

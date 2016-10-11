@@ -20,7 +20,7 @@ private:
     LabelContainer m_labels; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
 
-    CommandPointer createCommand(const CommandData &cmdData, Address address) const; // Создает команду
+    CommandPointer createCommand(const CommandData &cmdData) const; // Создает команду
 
     bool hasLabel(const CommandData &cmdData) const; // Проверяет наличие метки
     void addLabel(const std::string &label, Address address); // Добавляет метку в хранилище

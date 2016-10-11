@@ -8,8 +8,8 @@
 class ProcessorCommand : public Command
 {
 public:
-    ProcessorCommand(const CommandData &data, Address address, LabelContainer *labelContainer,
-                     ErrorContainer *errorContainer);
+    ProcessorCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
+
 protected:
     ProcessorCommandCode code() const; // Возвращает код команды
 

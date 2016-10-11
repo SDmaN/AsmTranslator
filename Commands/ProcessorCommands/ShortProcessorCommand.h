@@ -7,8 +7,7 @@
 class ShortProcessorCommand : public ProcessorCommand
 {
 public:
-    ShortProcessorCommand(const CommandData &data, Address address, LabelContainer *labelContainer,
-                          ErrorContainer *errorContainer);
+    ShortProcessorCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
     virtual size_t size() const override; // Возвращает размер
     virtual ByteArray translate() override; // Транлирует в машинный код

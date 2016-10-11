@@ -1,9 +1,8 @@
 #include "Command.h"
 #include "../ErrorsHandling/ErrorContainer.h"
 
-Command::Command(const CommandData &data, Address address, LabelContainer *labelContainer,
-                 ErrorContainer *errorContainer)
-        : m_data(data), m_address(address), m_labelContainer(labelContainer), m_errorContainer(errorContainer)
+Command::Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
+        : m_data(data), m_labelContainer(labelContainer), m_errorContainer(errorContainer)
 {
 }
 

@@ -1,8 +1,7 @@
 #include "ShortProcessorCommand.h"
 
-ShortProcessorCommand::ShortProcessorCommand(const CommandData &data, Address address, LabelContainer *labelContainer,
-                                             ErrorContainer *errorContainer)
-        : ProcessorCommand(data, address, labelContainer, errorContainer)
+ShortProcessorCommand::ShortProcessorCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
+        : ProcessorCommand(data, labelContainer, errorContainer)
 {
 }
 

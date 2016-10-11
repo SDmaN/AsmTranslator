@@ -20,9 +20,9 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
     return result;
 }
 
-CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData, Address address) const
+CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData) const
 {
-    return m_commandsCreator.create(cmdData, address, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
+    return m_commandsCreator.create(cmdData, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
 }
 
 bool AssemblerTranslator::hasLabel(const CommandData &cmdData) const
@@ -50,7 +50,7 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
         if(hasLabel(cmdData))
             addLabel(cmdData.label, currentCommandAddress);
 
-        CommandPointer command = createCommand(cmdData, currentCommandAddress);
+        CommandPointer command = createCommand(cmdData);
 
         if(command)
         {

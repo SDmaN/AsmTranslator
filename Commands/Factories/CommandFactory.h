@@ -7,8 +7,8 @@
 class CommandFactoryBase
 {
 public:
-    virtual CommandPointer create(const CommandData &cmdData, Address address, LabelContainer *labelContainer,
-                                  ErrorContainer *errorContainer) const = 0; // Создает команду
+    virtual CommandPointer
+    create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer) const = 0; // Создает команду
 };
 
 // Шаблон класса фабрики для конкретной команды
@@ -16,10 +16,10 @@ template<typename CommandType> // CommandType - тип создаваемой к
 class CommandFactory : public CommandFactoryBase
 {
 public:
-    virtual CommandPointer create(const CommandData &cmdData, Address address, LabelContainer *labelContainer,
-                                  ErrorContainer *errorContainer) const override // Создает конкретную команду
+    virtual CommandPointer
+    create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer) const override // Создает конкретную команду
     {
-        CommandPointer result(new CommandType(cmdData, address, labelContainer, errorContainer));
+        CommandPointer result(new CommandType(cmdData, labelContainer, errorContainer));
         return result;
     }
 };
