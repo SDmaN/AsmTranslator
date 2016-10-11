@@ -2,6 +2,7 @@
 #include "ErrorsHandling/ErrorContainer.h"
 
 AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer)
+    : m_errorContainer(errorContainer)
 {
 }
 
