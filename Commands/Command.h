@@ -5,6 +5,8 @@
 #include "CommandData.h"
 #include "../TypeDefines.h"
 
+class Command;
+
 typedef std::shared_ptr<Command> CommandPointer;
 
 class LabelContainer;

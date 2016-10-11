@@ -13,7 +13,7 @@ void LabelContainer::add(const std::pair<std::string, Address> &element)
 
 Address LabelContainer::address(const std::string &label) const
 {
-    return m_container[label];
+    return m_container.at(label);
 }
 
 void LabelContainer::clear()
