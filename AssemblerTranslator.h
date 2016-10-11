@@ -4,23 +4,30 @@
 #include "VmExecutable.h"
 #include "Commands/LabelContainer.h"
 #include "Commands/Command.h"
+#include "Commands/Factories/CommandsCreator.h"
+#include "ErrorsHandling/CompillerError.h"
 
 // Двупроходной транслятор с ассемблера
 class AssemblerTranslator
 {
 public:
-    AssemblerTranslator();
-    VmExecutable translate(std::vector<CommandData> &operators); // Транслирует операторы в модуль
+    AssemblerTranslator(ErrorContainer *errorContainer);
+    VmExecutable translate(const std::vector<CommandData> &cmdsData); // Транслирует операторы в модуль
 
 private:
-    //CommandCreator m_commandCreator;
+    CommandsCreator m_commandsCreator; // Создатель команд
 
     LabelContainer m_labels; // Хранилище меток
-    std::vector<CommandPointer> m_commands;
+    ErrorContainer *m_errorContainer; // Хранилище ошибок
 
-    CommandPointer createCommand(const CommandData &opData, Address address) const; // Создает команду
+    CommandPointer createCommand(const CommandData &cmdData, Address address) const; // Создает команду
 
-    bool firstPass(const std::vector<CommandData> &operators); // Первый проход
+    bool hasLabel(const CommandData &cmdData) const; // Проверяет наличие метки
+    void addLabel(const std::string &label, Address address); // Добавляет метку в хранилище
+
+    void handleError(const CommandData &cmdData, CompillerError error);
+
+    bool firstPass(const std::vector<CommandData> &cmdsData); // Первый проход
     VmExecutable secondPass(); // Второй проход
 };
 
