@@ -24,7 +24,7 @@ public:
 
     virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды
-    virtual VmExecutable translate() = 0; // Транслирует команду в машинный код
+    virtual ByteArray translate() = 0; // Транслирует команду в машинный код
 
 protected:
     LabelContainer *labelContainer() const;
