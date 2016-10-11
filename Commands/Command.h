@@ -2,7 +2,6 @@
 #define COMMAND_H
 
 #include <memory>
-#include <map>
 
 #include "CommandData.h"
 #include "../TypeDefines.h"
@@ -23,7 +22,7 @@ class Command
 public:
     Command(const CommandData &data, Address address, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
-    virtual bool hasError() const = 0; // Проверяет, содержит ли команда ошибку
+    virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды
     virtual VmExecutable translate() = 0; // Транслирует команду в машинный код
 
@@ -32,13 +31,11 @@ protected:
     void handleError(CompillerError error);
 
 private:
-    static std::map<std::string, ProcessorCommandCode> m_shortCodes;
-    static std::map<std::string, ProcessorCommandCode> m_longCodes;
-
     CommandData m_data; // Данные команды
     Address m_address; // Адрес команды относительно начала
     LabelContainer *m_labelContainer; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
+    bool m_hasError; // Имеет ли команда ошибку
 };
 
 #endif //COMMAND_H
