@@ -21,7 +21,7 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
 
 CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData, Address address) const
 {
-    return m_commandsCreator.create(cmdData, address, &m_labels, m_errorContainer);
+    return m_commandsCreator.create(cmdData, address, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
 }
 
 bool AssemblerTranslator::hasLabel(const CommandData &cmdData) const
