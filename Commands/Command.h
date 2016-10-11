@@ -2,9 +2,13 @@
 #define COMMAND_H
 
 #include <memory>
+#include <map>
+
 #include "CommandData.h"
 #include "../TypeDefines.h"
 #include "../VmExecutable.h"
+#include "ProcessorCommandCode.h"
+#include "../ErrorsHandling/CompillerError.h"
 
 class Command;
 
@@ -25,9 +29,12 @@ public:
 
 protected:
     LabelContainer *labelContainer() const;
-    ErrorContainer *errorContainer() const;
+    void handleError(CompillerError error);
 
 private:
+    static std::map<std::string, ProcessorCommandCode> m_shortCodes;
+    static std::map<std::string, ProcessorCommandCode> m_longCodes;
+
     CommandData m_data; // Данные команды
     Address m_address; // Адрес команды относительно начала
     LabelContainer *m_labelContainer; // Хранилище меток
