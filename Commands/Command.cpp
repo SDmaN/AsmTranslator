@@ -6,6 +6,11 @@ Command::Command(const CommandData &data, LabelContainer *labelContainer, ErrorC
 {
 }
 
+const CommandData &Command::data() const
+{
+    return m_data;
+}
+
 bool Command::hasError() const
 {
     return m_hasError;

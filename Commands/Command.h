@@ -22,6 +22,8 @@ class Command
 public:
     Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
+    const CommandData &data() const; // Возвращает данные команды
+
     virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды
     virtual ByteArray translate() = 0; // Транслирует команду в машинный код
@@ -32,7 +34,6 @@ protected:
 
 private:
     CommandData m_data; // Данные команды
-    Address m_address; // Адрес команды относительно начала
     LabelContainer *m_labelContainer; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
     bool m_hasError; // Имеет ли команда ошибку
