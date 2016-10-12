@@ -15,9 +15,9 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
     bool hasError = firstPass(cmdsData);
 
     if(!hasError)
-        result = secondPass();
+        hasError = secondPass(result);
 
-    return result;
+    return hasError ? VmExecutable() : result;
 }
 
 CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData) const
@@ -56,6 +56,7 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
         {
             currentCommandAddress += command->size();
             hasError = command->hasError(); // Сама ошибка обработана командой
+            m_commands.push_back(command);
         }
         else
         { // Нашли неверную команду
@@ -67,7 +68,21 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
     return hasError;
 }
 
-VmExecutable AssemblerTranslator::secondPass()
+bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
 {
-    return VmExecutable();
+    bool hasError = false;
+    Address currentCommandAddress = 0;
+
+    for(CommandPointer &command : m_commands)
+    {
+        if(command)
+        {
+            command->translate(vmExec, currentCommandAddress);
+            currentCommandAddress += command->size();
+
+            hasError = command->hasError();
+        }
+    }
+
+    return hasError;
 }

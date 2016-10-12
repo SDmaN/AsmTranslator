@@ -20,6 +20,8 @@ private:
     LabelContainer m_labels; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
 
+    std::vector<CommandPointer> m_commands; // Команды, собранные в первом проходе
+
     CommandPointer createCommand(const CommandData &cmdData) const; // Создает команду
 
     bool hasLabel(const CommandData &cmdData) const; // Проверяет наличие метки
@@ -28,7 +30,7 @@ private:
     void handleError(const CommandData &cmdData, CompillerError error);
 
     bool firstPass(const std::vector<CommandData> &cmdsData); // Первый проход
-    VmExecutable secondPass(); // Второй проход
+    bool secondPass(VmExecutable &vmExec); // Второй проход
 };
 
 #endif //ASSEMBLERTRANSLATOR_H
