@@ -15,7 +15,7 @@ size_t LongProcessorCommand::size() const
     return LongCommandSize;
 }
 
-void LongProcessorCommand::translate(VmExecutable &vmExec)
+void LongProcessorCommand::translate(VmExecutable &vmExec, Address commandAddress)
 {
     if(!hasError())
     {
@@ -32,6 +32,7 @@ void LongProcessorCommand::translate(VmExecutable &vmExec)
 
             vmExec.appendProgramByte(static_cast<Byte>(code()));
             vmExec.appendProgramBytes(addressBytes);
+            vmExec.appendRelativeAdress(commandAddress + sizeof(code())); // Адрес аргумента сразу после кода
         }
     }
 }

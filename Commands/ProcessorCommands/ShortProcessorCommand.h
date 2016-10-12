@@ -10,7 +10,7 @@ public:
     ShortProcessorCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
 
     virtual size_t size() const override; // Возвращает размер
-    virtual void translate(VmExecutable &vmExec) override; // Транлирует в машинный код
+    virtual void translate(VmExecutable &vmExec, Address) override; // Транлирует в машинный код
 
 private:
     const std::size_t ShortCommandSize = 1; // Размер в байтах
