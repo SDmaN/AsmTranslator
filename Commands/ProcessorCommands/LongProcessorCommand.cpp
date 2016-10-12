@@ -15,7 +15,7 @@ size_t LongProcessorCommand::size() const
     return LongCommandSize;
 }
 
-ByteArray LongProcessorCommand::translate()
+void LongProcessorCommand::translate(VmExecutable &vmExec)
 {
     if(!hasError())
     {
@@ -30,14 +30,10 @@ ByteArray LongProcessorCommand::translate()
             Address argAddress = getArgAddress();
             ByteArray addressBytes = addressToBytes(argAddress);
 
-            ByteArray result = { static_cast<Byte> (code()), 0, 0 };
-
-            for(Byte b : addressBytes)
-                result.push_back(b);
+            vmExec.appendProgramByte(static_cast<Byte>(code()));
+            vmExec.appendProgramBytes(addressBytes);
         }
     }
-
-    return ByteArray();
 }
 
 bool LongProcessorCommand::checkArgCorrectness() const

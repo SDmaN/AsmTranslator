@@ -15,6 +15,7 @@ typedef std::shared_ptr<Command> CommandPointer;
 
 class LabelContainer;
 class ErrorContainer;
+class VmExecutable;
 
 // Абстрактный класс команды процессора или ассемблера
 class Command
@@ -26,7 +27,7 @@ public:
 
     virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
     virtual std::size_t size() const = 0; // Вычисляет размер команды
-    virtual ByteArray translate() = 0; // Транслирует команду в машинный код
+    virtual void translate(VmExecutable &vmExec) = 0; // Транслирует команду в машинный код
 
 protected:
     LabelContainer *labelContainer() const;

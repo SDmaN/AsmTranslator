@@ -10,10 +10,8 @@ size_t ShortProcessorCommand::size() const
     return ShortCommandSize;
 }
 
-ByteArray ShortProcessorCommand::translate()
+void ShortProcessorCommand::translate(VmExecutable &vmExec)
 {
     if(!hasError())
-        return { static_cast<Byte>(code()) };
-
-    return ByteArray();
+        vmExec.appendProgramByte(static_cast<Byte>(code()));
 }
