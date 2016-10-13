@@ -1,4 +1,7 @@
+#include <fstream>
+
 #include "VmExecutable.h"
+#include "ErrorsHandling/Exceptions/FileNotFoundException.h"
 
 VmExecutable::VmExecutable()
         : m_ip(0)
@@ -46,4 +49,25 @@ void VmExecutable::clear()
     m_programBytes.clear();
     m_relativesTable.clear();
     m_ip = 0;
+}
+
+void VmExecutable::write(std::ostream &s) const
+{
+    s.write(static_cast<char *>(&m_ip), sizeof(m_ip)); // Сначала IP
+
+    std::size_t relativeTableSize = m_relativesTable.size();
+    s.write(static_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
+
+    for(Byte b : m_programBytes)
+        s.write(&b, sizeof(b));
+}
+
+void VmExecutable::write(const std::string &fileName) const
+{
+    std::fstream file(fileName);
+
+    if(file.is_open())
+        write(file);
+
+    throw FileNotFoundException("Не удалось открыть файл " + fileName);
 }

@@ -1,6 +1,7 @@
 #ifndef VMEXECUTABLE_H
 #define VMEXECUTABLE_H
 
+#include <ostream>
 #include "TypeDefines.h"
 
 typedef std::vector<Address> RelativesTable;
@@ -21,6 +22,9 @@ public:
 
     bool empty() const; // Проверяет, пуст ли модуль
     void clear(); // Очищает модуль
+
+    void write(std::ostream &s) const; // Записывает исполняемый файл в поток
+    void write(const std::string &fileName) const; // Записывает исполняемый файл на диск
 
 private:
     RelativesTable m_relativesTable; // Таблица относительных адресов
