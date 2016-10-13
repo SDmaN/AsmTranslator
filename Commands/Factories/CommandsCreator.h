@@ -9,6 +9,7 @@
 #include "../ProcessorCommands/ShortProcessorCommand.h"
 #include "../ProcessorCommands/LongProcessorCommand.h"
 #include "../TranslatorCommands/AllocateCommand.h"
+#include "../TranslatorCommands/EndCommand.h"
 
 // Класс создателя команд (обращается к фабрикам)
 class CommandsCreator
@@ -22,6 +23,7 @@ private:
     static CommandFactory<LongProcessorCommand> m_longProcessorCommandFactory; // Фабрика длинных команд
     static CommandFactory<AllocateCommand<Dword>> m_dwAllocateCommandFactory; // Фабрика для директив выделения целых
     static CommandFactory<AllocateCommand<Float>> m_fltAllocateCommandFactory; // Фабрика для директив выделения дробных
+    static CommandFactory<EndCommand> m_endCommandFactory; // Фабрика для End
     static std::map<std::string, CommandFactoryBase *> m_commandFactories; // Код-фабрика
 };
 

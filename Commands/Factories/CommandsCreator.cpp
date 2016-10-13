@@ -5,6 +5,7 @@ CommandFactory<ShortProcessorCommand> CommandsCreator::m_shortProcessorCommandFa
 CommandFactory<LongProcessorCommand> CommandsCreator::m_longProcessorCommandFactory;
 CommandFactory<AllocateCommand<Dword>> CommandsCreator::m_dwAllocateCommandFactory;
 CommandFactory<AllocateCommand<Float>> CommandsCreator::m_fltAllocateCommandFactory;
+CommandFactory<EndCommand> CommandsCreator::m_endCommandFactory;
 
 std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories = {
         { "Nop",        &m_shortProcessorCommandFactory },
@@ -64,7 +65,8 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
         { "Call",       &m_longProcessorCommandFactory },
 
         { "AllocDword", &m_dwAllocateCommandFactory },
-        { "AllocFloat", &m_fltAllocateCommandFactory }
+        { "AllocFloat", &m_fltAllocateCommandFactory },
+        { "End",        &m_endCommandFactory }
 };
 
 // ============================================
