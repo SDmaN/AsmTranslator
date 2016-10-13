@@ -28,11 +28,11 @@ void LongProcessorCommand::translate(VmExecutable &vmExec, Address commandAddres
         else
         {
             Address argAddress = getArgAddress();
-            ByteArray addressBytes = addressToBytes(argAddress);
+            ByteArray addressBytes = toBytes(argAddress);
 
-            vmExec.appendProgramByte(static_cast<Byte>(code()));
-            vmExec.appendProgramBytes(addressBytes);
-            vmExec.appendRelativeAdress(commandAddress + sizeof(code())); // Адрес аргумента сразу после кода
+            vmExec.appendByte(static_cast<Byte>(code()));
+            vmExec.appendBytes(addressBytes);
+            vmExec.appendRelativeAddress(commandAddress + sizeof(code())); // Адрес аргумента сразу после кода
         }
     }
 }

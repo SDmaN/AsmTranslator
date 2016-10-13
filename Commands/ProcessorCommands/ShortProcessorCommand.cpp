@@ -13,5 +13,5 @@ size_t ShortProcessorCommand::size() const
 void ShortProcessorCommand::translate(VmExecutable &vmExec, Address)
 {
     if(!hasError())
-        vmExec.appendProgramByte(static_cast<Byte>(code()));
+        vmExec.appendByte(static_cast<Byte>(code()));
 }
