@@ -24,5 +24,7 @@ LabelContainer *Command::labelContainer() const
 void Command::handleError(CompillerError error)
 {
     m_hasError = true;
-    m_errorContainer->add(m_data.lineIndex, m_data.sourceLine, error);
+
+    if(m_errorContainer != nullptr)
+        m_errorContainer->add(m_data.lineIndex, m_data.sourceLine, error);
 }

@@ -55,7 +55,7 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
         if(command)
         {
             currentCommandAddress += command->size();
-            hasError = command->hasError(); // Сама ошибка обработана командой
+            hasError |= command->hasError(); // Сама ошибка обработана командой
             m_commands.push_back(command);
         }
         else
@@ -80,7 +80,7 @@ bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
             command->translate(vmExec, currentCommandAddress);
             currentCommandAddress += command->size();
 
-            hasError = command->hasError();
+            hasError |= command->hasError();
         }
     }
 
