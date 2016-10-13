@@ -121,7 +121,7 @@ private:
     }
 
     // Возвращает паттерн для элемента последовательности (для Float - отдельный)
-    std::string numberPattern() const
+    inline std::string numberPattern() const
     {
         return "[+-]?\\d+";
     }
@@ -168,7 +168,7 @@ private:
 
 // Специализация для Float
 template<>
-std::string AllocateCommand<float>::numberPattern() const
+inline std::string AllocateCommand<float>::numberPattern() const
 {
     return "[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?";
 }
