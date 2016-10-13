@@ -51,18 +51,18 @@ void VmExecutable::clear()
     m_ip = 0;
 }
 
-void VmExecutable::write(std::ostream &s) const
+void VmExecutable::write(std::ostream &s)
 {
-    s.write(static_cast<char *>(&m_ip), sizeof(m_ip)); // Сначала IP
+    s.write(reinterpret_cast<char *>(&m_ip), sizeof(m_ip)); // Сначала IP
 
     std::size_t relativeTableSize = m_relativesTable.size();
-    s.write(static_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
+    s.write(reinterpret_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
 
     for(Byte b : m_programBytes)
         s.write(&b, sizeof(b));
 }
 
-void VmExecutable::write(const std::string &fileName) const
+void VmExecutable::write(const std::string &fileName)
 {
     std::fstream file(fileName);
 

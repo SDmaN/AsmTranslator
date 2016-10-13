@@ -1,8 +1,8 @@
 #include "AssemblerTranslator.h"
 #include "ErrorsHandling/ErrorContainer.h"
 
-AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer)
-    : m_errorContainer(errorContainer)
+AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer, Listing *listing)
+    : m_errorContainer(errorContainer), m_listing(listing)
 {
 }
 
@@ -22,7 +22,7 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
 
 CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData) const
 {
-    return m_commandsCreator.create(cmdData, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
+    return m_commandsCreator.create(cmdData, const_cast<LabelContainer *>(&m_labels), m_errorContainer, m_listing);
 }
 
 bool AssemblerTranslator::hasLabel(const CommandData &cmdData) const

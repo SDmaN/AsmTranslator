@@ -1,8 +1,10 @@
 #include "Command.h"
 #include "../ErrorsHandling/ErrorContainer.h"
+#include "../Listing/Listing.h"
 
-Command::Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
-        : m_data(data), m_labelContainer(labelContainer), m_errorContainer(errorContainer)
+Command::Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+                 Listing *listing)
+        : m_data(data), m_labelContainer(labelContainer), m_errorContainer(errorContainer), m_listing(listing)
 {
 }
 
@@ -27,4 +29,21 @@ void Command::handleError(CompillerError error)
 
     if(m_errorContainer != nullptr)
         m_errorContainer->add(m_data.lineIndex, m_data.sourceLine, error);
+}
+
+void Command::translate(VmExecutable &vmExec, Address commandAddress)
+{
+    if(!hasError())
+    {
+        ByteArray translatedBytes = writeExecutable(vmExec, commandAddress);
+        writeListing(commandAddress, translatedBytes);
+    }
+}
+
+void Command::writeListing(Address commandAddress, const ByteArray &translatedBytes)
+{
+    if(m_listing != nullptr)
+    {
+        // TODO: запись в листинг
+    }
 }

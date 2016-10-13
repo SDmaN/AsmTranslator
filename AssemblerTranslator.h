@@ -7,11 +7,13 @@
 #include "Commands/Factories/CommandsCreator.h"
 #include "ErrorsHandling/CompillerError.h"
 
+class Listing;
+
 // Двупроходной транслятор с ассемблера
 class AssemblerTranslator
 {
 public:
-    AssemblerTranslator(ErrorContainer *errorContainer);
+    AssemblerTranslator(ErrorContainer *errorContainer, Listing *listing);
     VmExecutable translate(const std::vector<CommandData> &cmdsData); // Транслирует операторы в модуль
 
 private:
@@ -19,6 +21,7 @@ private:
 
     LabelContainer m_labels; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
+    Listing *m_listing; // листинг
 
     std::vector<CommandPointer> m_commands; // Команды, собранные в первом проходе
 

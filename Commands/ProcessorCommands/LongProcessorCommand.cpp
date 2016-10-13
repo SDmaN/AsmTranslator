@@ -5,8 +5,8 @@
 #include "../../Utils/Utils.h"
 
 LongProcessorCommand::LongProcessorCommand(const CommandData &data, LabelContainer *labelContainer,
-                                           ErrorContainer *errorContainer)
-        : ProcessorCommand(data, labelContainer, errorContainer)
+                                           ErrorContainer *errorContainer, Listing *listing)
+        : ProcessorCommand(data, labelContainer, errorContainer, listing)
 {
 }
 
@@ -15,7 +15,7 @@ size_t LongProcessorCommand::size() const
     return LongCommandSize;
 }
 
-void LongProcessorCommand::translate(VmExecutable &vmExec, Address commandAddress)
+ByteArray LongProcessorCommand::writeExecutable(VmExecutable &vmExec, Address commandAddress)
 {
     if(!hasError())
     {
@@ -30,11 +30,18 @@ void LongProcessorCommand::translate(VmExecutable &vmExec, Address commandAddres
             Address argAddress = getArgAddress();
             ByteArray addressBytes = toBytes(argAddress);
 
-            vmExec.appendByte(static_cast<Byte>(code()));
-            vmExec.appendBytes(addressBytes);
+            ByteArray result(LongCommandSize);
+            result.push_back(static_cast<Byte>(code())); // Байт кода операции
+            result.insert(std::end(result), std::begin(addressBytes), std::end(addressBytes)); // Дописываем 2 байта адреса
+
+            vmExec.appendBytes(result);
             vmExec.appendRelativeAddress(commandAddress + sizeof(code())); // Адрес аргумента сразу после кода
+
+            return result;
         }
     }
+
+    return ByteArray();
 }
 
 bool LongProcessorCommand::checkArgCorrectness() const

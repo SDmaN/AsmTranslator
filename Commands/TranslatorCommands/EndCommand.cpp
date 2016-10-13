@@ -2,8 +2,9 @@
 #include "EndCommand.h"
 #include "../LabelContainer.h"
 
-EndCommand::EndCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
-        : Command(data, labelContainer, errorContainer)
+EndCommand::EndCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+                       Listing *listing)
+        : Command(data, labelContainer, errorContainer, listing)
 {
     parseArg();
 }
@@ -13,13 +14,19 @@ size_t EndCommand::size() const
     return m_commandSize;
 }
 
-void EndCommand::translate(VmExecutable &vmExec, Address)
+ByteArray EndCommand::writeExecutable(VmExecutable &vmExec, Address)
 {
     if(!hasError())
     {
+        ByteArray result = { static_cast<Byte>(m_stopCommandCode) };
+
         vmExec.setIp(m_ip);
-        vmExec.appendByte(static_cast<Byte>(m_stopCommandCode));
+        vmExec.appendBytes(result);
+
+        return result;
     }
+
+    return ByteArray();
 }
 
 void EndCommand::parseArg()

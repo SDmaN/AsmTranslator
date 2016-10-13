@@ -71,7 +71,9 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
 
 // ============================================
 
-CommandPointer CommandsCreator::create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer) const
+CommandPointer
+CommandsCreator::create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+                        Listing *listing) const
 {
     auto factoriesIt = m_commandFactories.find(cmdData.code);
 
@@ -81,5 +83,5 @@ CommandPointer CommandsCreator::create(const CommandData &cmdData, LabelContaine
         return CommandPointer();
     }
 
-    return factoriesIt->second->create(cmdData, labelContainer, errorContainer);
+    return factoriesIt->second->create(cmdData, labelContainer, errorContainer, listing);
 }

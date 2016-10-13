@@ -14,35 +14,41 @@ template<typename AllocatingItemType>
 class AllocateCommand : public Command
 {
 public:
-    AllocateCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
-            : Command(data, labelContainer, errorContainer), m_commandSize(0), m_allocatingItemsCount(0)
+    AllocateCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+                    Listing *listing)
+            : Command(data, labelContainer, errorContainer, listing)
     {
-        parseArg(data.arg);
     }
 
-    // Возвращает размер выделенной области
+// Возвращает размер выделенной области
     virtual size_t size() const override
     {
         return m_commandSize;
     }
 
+protected:
     // Транслирует выделенную область в массив байт
     // Если выделяется массив, то он заполняется нулями
-    virtual void translate(VmExecutable &vmExec, Address commandAddress) override
+    virtual ByteArray writeExecutable(VmExecutable &vmExec, Address commandAddress) override
     {
+        ByteArray result;
+
         switch(m_argType)
         {
             case ArgType::Array:
-                translateArray(vmExec);
+                result = translateArray();
                 break;
 
             case ArgType::Sequence:
-                parseSequence(vmExec);
+                result = translateSequence();
                 break;
 
             default:
                 break;
         }
+
+        vmExec.appendBytes(result);
+        return result;
     }
 
 private:
@@ -153,16 +159,24 @@ private:
     }
 
     // Транслирует аргумент как массив
-    void translateArray(VmExecutable &vmExec)
+    ByteArray translateArray()
     {
-        vmExec.appendZeroBytes(m_commandSize);
+        ByteArray result(m_commandSize, 0);
+        return result;
     }
 
     // Транслирует аргумент как последовательность
-    void parseSequence(VmExecutable &vmExec)
+    ByteArray translateSequence()
     {
+        ByteArray result;
+
         for(auto &item : m_allocatingItems)
-            vmExec.appendBytes(toBytes(item));
+        {
+            ByteArray itemArray = toBytes(item);
+            result.insert(std::end(result), std::begin(itemArray), std::end(itemArray));
+        }
+
+        return result;
     }
 };
 

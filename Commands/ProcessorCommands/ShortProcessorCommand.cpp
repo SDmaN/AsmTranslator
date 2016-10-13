@@ -1,7 +1,8 @@
 #include "ShortProcessorCommand.h"
 
-ShortProcessorCommand::ShortProcessorCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer)
-        : ProcessorCommand(data, labelContainer, errorContainer)
+ShortProcessorCommand::ShortProcessorCommand(const CommandData &data, LabelContainer *labelContainer,
+                                             ErrorContainer *errorContainer, Listing *listing)
+        : ProcessorCommand(data, labelContainer, errorContainer, listing)
 {
 }
 
@@ -10,8 +11,15 @@ size_t ShortProcessorCommand::size() const
     return ShortCommandSize;
 }
 
-void ShortProcessorCommand::translate(VmExecutable &vmExec, Address)
+ByteArray ShortProcessorCommand::writeExecutable(VmExecutable &vmExec, Address)
 {
     if(!hasError())
-        vmExec.appendByte(static_cast<Byte>(code()));
+    {
+        ByteArray result = { static_cast<Byte>(code()) };
+        vmExec.appendBytes(result);
+
+        return result;
+    }
+
+    return ByteArray();
 }

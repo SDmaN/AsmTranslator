@@ -16,7 +16,8 @@ class CommandsCreator
 {
 public:
     // Создает команду
-    CommandPointer create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer) const;
+    CommandPointer create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+                          Listing *listing) const;
 
 private:
     static CommandFactory<ShortProcessorCommand> m_shortProcessorCommandFactory; // Фабрика коротких команд

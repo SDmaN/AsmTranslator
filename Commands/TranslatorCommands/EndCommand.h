@@ -7,10 +7,13 @@
 class EndCommand : public Command
 {
 public:
-    EndCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer);
+    EndCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
+               Listing *listing);
 
     virtual size_t size() const override; // Возвращает размер
-    virtual void translate(VmExecutable &vmExec, Address commandAddress) override; // Транслирует команду (вставляет Stop)
+
+protected:
+    virtual ByteArray writeExecutable(VmExecutable &vmExec, Address commandAddress) override; // Транслирует команду (вставляет Stop)
 
 private:
     const std::size_t m_commandSize = 1; // Размер Stop
