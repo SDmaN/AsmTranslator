@@ -6,6 +6,8 @@ CommandFactory<LongProcessorCommand> CommandsCreator::m_longProcessorCommandFact
 CommandFactory<AllocateCommand<Dword>> CommandsCreator::m_dwAllocateCommandFactory;
 CommandFactory<AllocateCommand<Float>> CommandsCreator::m_fltAllocateCommandFactory;
 CommandFactory<EndCommand> CommandsCreator::m_endCommandFactory;
+CommandFactory<UnknownCommand> CommandsCreator::m_unknownCommandFactory;
+CommandFactory<LabelCommand> CommandsCreator::m_labelCommandFactory;
 
 std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories = {
         { "Nop",        &m_shortProcessorCommandFactory },
@@ -72,16 +74,16 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
 // ============================================
 
 CommandPointer
-CommandsCreator::create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer,
-                        Listing *listing) const
+CommandsCreator::create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer,
+                        ErrorContainer *errorContainer) const
 {
+    if(cmdData.code.empty() && !cmdData.label.empty())
+        return m_labelCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
+
     auto factoriesIt = m_commandFactories.find(cmdData.code);
 
     if(factoriesIt == std::end(m_commandFactories))
-    {
-        errorContainer->add(cmdData.lineIndex, cmdData.sourceLine, CompillerError::CommandNotFound);
-        return CommandPointer();
-    }
+        return m_unknownCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
 
-    return factoriesIt->second->create(cmdData, labelContainer, errorContainer, listing);
+    return factoriesIt->second->create(cmdData, commandAddress, labelContainer, errorContainer);
 }

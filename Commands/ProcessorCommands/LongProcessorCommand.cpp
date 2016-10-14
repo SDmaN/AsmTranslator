@@ -4,9 +4,10 @@
 #include "../LabelContainer.h"
 #include "../../Utils/Utils.h"
 
-LongProcessorCommand::LongProcessorCommand(const CommandData &data, LabelContainer *labelContainer,
-                                           ErrorContainer *errorContainer, Listing *listing)
-        : ProcessorCommand(data, labelContainer, errorContainer, listing)
+LongProcessorCommand::LongProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
+                                           ErrorContainer *errorContainer)
+        : ProcessorCommand(data, commandAddress, labelContainer, errorContainer),
+          m_labelCommand(data, commandAddress, labelContainer, errorContainer)
 {
 }
 
@@ -15,8 +16,11 @@ size_t LongProcessorCommand::size() const
     return LongCommandSize;
 }
 
-ByteArray LongProcessorCommand::writeExecutable(VmExecutable &vmExec, Address commandAddress)
+void LongProcessorCommand::translate(VmExecutable &vmExec)
 {
+    m_labelCommand.translate(vmExec);
+    ByteArray result;
+
     if(!hasError())
     {
         if(!checkArgCorrectness())
@@ -30,18 +34,16 @@ ByteArray LongProcessorCommand::writeExecutable(VmExecutable &vmExec, Address co
             Address argAddress = getArgAddress();
             ByteArray addressBytes = toBytes(argAddress);
 
-            ByteArray result(LongCommandSize);
+            result.reserve(LongCommandSize);
             result.push_back(static_cast<Byte>(code())); // Байт кода операции
             result.insert(std::end(result), std::begin(addressBytes), std::end(addressBytes)); // Дописываем 2 байта адреса
 
             vmExec.appendBytes(result);
-            vmExec.appendRelativeAddress(commandAddress + sizeof(code())); // Адрес аргумента сразу после кода
-
-            return result;
+            vmExec.appendRelativeAddress(address() + sizeof(code())); // Адрес аргумента сразу после кода
         }
     }
 
-    return ByteArray();
+    setTranslatedBytes(result);
 }
 
 bool LongProcessorCommand::checkArgCorrectness() const

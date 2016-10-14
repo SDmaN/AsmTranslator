@@ -1,8 +1,9 @@
 #include "AssemblerTranslator.h"
 #include "ErrorsHandling/ErrorContainer.h"
+#include "Listing/Listing.h"
 
-AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer, Listing *listing)
-    : m_errorContainer(errorContainer), m_listing(listing)
+AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer)
+    : m_errorContainer(errorContainer)
 {
 }
 
@@ -20,19 +21,14 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
     return hasError ? VmExecutable() : result;
 }
 
-CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData) const
+const std::vector<CommandPointer> &AssemblerTranslator::translatedCommands() const
 {
-    return m_commandsCreator.create(cmdData, const_cast<LabelContainer *>(&m_labels), m_errorContainer, m_listing);
+    return m_translatedCommands;
 }
 
-bool AssemblerTranslator::hasLabel(const CommandData &cmdData) const
+CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData, Address commandAddress) const
 {
-    return !cmdData.label.empty();
-}
-
-void AssemblerTranslator::addLabel(const std::string &label, Address address)
-{
-    m_labels.add(std::make_pair(label, address));
+    return m_commandsCreator.create(cmdData, commandAddress, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
 }
 
 void AssemblerTranslator::handleError(const CommandData &cmdData, CompillerError error)
@@ -47,16 +43,13 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
 
     for(const auto &cmdData : cmdsData)
     {
-        if(hasLabel(cmdData))
-            addLabel(cmdData.label, currentCommandAddress);
-
-        CommandPointer command = createCommand(cmdData);
+        CommandPointer command = createCommand(cmdData, currentCommandAddress);
 
         if(command)
         {
             currentCommandAddress += command->size();
             hasError |= command->hasError(); // Сама ошибка обработана командой
-            m_commands.push_back(command);
+            m_translatedCommands.push_back(command);
         }
         else
         { // Нашли неверную команду
@@ -71,15 +64,12 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
 bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
 {
     bool hasError = false;
-    Address currentCommandAddress = 0;
 
-    for(CommandPointer &command : m_commands)
+    for(CommandPointer &command : m_translatedCommands)
     {
         if(command)
         {
-            command->translate(vmExec, currentCommandAddress);
-            currentCommandAddress += command->size();
-
+            command->translate(vmExec);
             hasError |= command->hasError();
         }
     }

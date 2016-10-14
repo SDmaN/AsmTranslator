@@ -28,17 +28,6 @@ void VmExecutable::appendBytes(const ByteArray &bytes)
     m_programBytes.insert(std::begin(m_programBytes), std::begin(bytes), std::end(bytes));
 }
 
-void VmExecutable::appendByte(Byte byte)
-{
-    m_programBytes.push_back(byte);
-}
-
-void VmExecutable::appendZeroBytes(std::size_t count)
-{
-    while(count-- > 0)
-        appendByte(0);
-}
-
 bool VmExecutable::empty() const
 {
     return m_programBytes.empty();

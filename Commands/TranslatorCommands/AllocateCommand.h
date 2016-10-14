@@ -6,6 +6,7 @@
 #include <cstdlib>
 
 #include "../Command.h"
+#include "../LabelCommand.h"
 #include "../../Utils/Utils.h"
 
 // Директива для выделения памяти
@@ -14,23 +15,26 @@ template<typename AllocatingItemType>
 class AllocateCommand : public Command
 {
 public:
-    AllocateCommand(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
-                    Listing *listing)
-            : Command(data, labelContainer, errorContainer, listing)
+    AllocateCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
+                        ErrorContainer *errorContainer)
+            : Command(data, commandAddress, labelContainer, errorContainer),
+              m_labelCommand(data, commandAddress, labelContainer, errorContainer)
     {
+        parseArg(data.arg);
     }
 
-// Возвращает размер выделенной области
+    // Возвращает размер выделенной области
     virtual size_t size() const override
     {
         return m_commandSize;
     }
 
-protected:
     // Транслирует выделенную область в массив байт
     // Если выделяется массив, то он заполняется нулями
-    virtual ByteArray writeExecutable(VmExecutable &vmExec, Address commandAddress) override
+    virtual void translate(VmExecutable &vmExec) override
     {
+        m_labelCommand.translate(vmExec);
+
         ByteArray result;
 
         switch(m_argType)
@@ -48,7 +52,7 @@ protected:
         }
 
         vmExec.appendBytes(result);
-        return result;
+        setTranslatedBytes(result);
     }
 
 private:
@@ -68,6 +72,8 @@ private:
     std::size_t m_allocatingItemsCount = 0; // Количество выделяемых элементов
     std::vector<AllocatingItemType> m_allocatingItems; // Выделяемые элементы (используется только для последовательности)
     ArgType m_argType; // Тип аргумента
+
+    LabelCommand m_labelCommand;
 
     // Парсит аргумент, вычисляя го тип
     void parseArg(const std::string &arg)

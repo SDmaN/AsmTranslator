@@ -5,12 +5,7 @@ CommandData::CommandData()
 {
 }
 
-CommandData::CommandData(const CommandData &other)
-        : lineIndex(other.lineIndex), label(other.label), code(other.code), arg(other.arg), comment(other.comment)
+bool CommandData::empty() const
 {
-}
-
-CommandData::CommandData(CommandData &&other)
-        : lineIndex(other.lineIndex), label(other.label), code(other.code), arg(other.arg), comment(other.comment)
-{
+    return label.empty() && code.empty() && comment.empty();
 }

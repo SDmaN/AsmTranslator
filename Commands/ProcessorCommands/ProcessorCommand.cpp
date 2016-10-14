@@ -67,9 +67,9 @@ std::map<std::string, ProcessorCommandCode> ProcessorCommand::m_longCodes = {
         { "Call",     ProcessorCommandCode::Call }
 };
 
-ProcessorCommand::ProcessorCommand(const CommandData &data, LabelContainer *labelContainer,
-                                   ErrorContainer *errorContainer, Listing *listingMaker)
-        : Command(data, labelContainer, errorContainer, listingMaker)
+ProcessorCommand::ProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
+                                   ErrorContainer *errorContainer)
+        : Command(data, commandAddress, labelContainer, errorContainer)
 {
     extractCode(data);
 }

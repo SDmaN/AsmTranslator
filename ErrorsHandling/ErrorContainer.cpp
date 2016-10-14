@@ -14,3 +14,8 @@ void ErrorContainer::clear()
 {
     m_errors.clear();
 }
+
+const std::vector<Error> &ErrorContainer::errors() const
+{
+    return m_errors;
+}

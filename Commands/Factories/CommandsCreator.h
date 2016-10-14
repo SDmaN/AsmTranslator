@@ -10,14 +10,16 @@
 #include "../ProcessorCommands/LongProcessorCommand.h"
 #include "../TranslatorCommands/AllocateCommand.h"
 #include "../TranslatorCommands/EndCommand.h"
+#include "../UnknownCommand.h"
+#include "../LabelCommand.h"
 
 // Класс создателя команд (обращается к фабрикам)
 class CommandsCreator
 {
 public:
     // Создает команду
-    CommandPointer create(const CommandData &cmdData, LabelContainer *labelContainer, ErrorContainer *errorContainer,
-                          Listing *listing) const;
+    CommandPointer create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer,
+                          ErrorContainer *errorContainer) const;
 
 private:
     static CommandFactory<ShortProcessorCommand> m_shortProcessorCommandFactory; // Фабрика коротких команд
@@ -25,6 +27,8 @@ private:
     static CommandFactory<AllocateCommand<Dword>> m_dwAllocateCommandFactory; // Фабрика для директив выделения целых
     static CommandFactory<AllocateCommand<Float>> m_fltAllocateCommandFactory; // Фабрика для директив выделения дробных
     static CommandFactory<EndCommand> m_endCommandFactory; // Фабрика для End
+    static CommandFactory<UnknownCommand> m_unknownCommandFactory; // Фабрика для ошибочных
+    static CommandFactory<LabelCommand> m_labelCommandFactory; // Фабрика для команд лейблов
     static std::map<std::string, CommandFactoryBase *> m_commandFactories; // Код-фабрика
 };
 

@@ -14,8 +14,8 @@ struct CommandData
     std::string comment;
 
     CommandData();
-    CommandData(const CommandData &other);
-    CommandData(CommandData &&other);
+
+    bool empty() const;
 };
 
 #endif //COMMANDDATA_H

@@ -15,35 +15,35 @@ typedef std::shared_ptr<Command> CommandPointer;
 
 class LabelContainer;
 class ErrorContainer;
-class Listing;
 
 // Абстрактный класс команды процессора или ассемблера
 class Command
 {
 public:
-    Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer, Listing *listing);
+    Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
+                ErrorContainer *errorContainer);
 
     const CommandData &data() const; // Возвращает данные команды
+    Address address() const;
 
-    virtual bool hasError() const; // Проверяет, содержит ли команда ошибку
+    bool hasError() const; // Проверяет, содержит ли команда ошибку
+    ByteArray translatedBytes() const; // Возвращает результат трансляции в байтах
+
     virtual std::size_t size() const = 0; // Вычисляет размер команды
-
-    void translate(VmExecutable &vmExec, Address commandAddress);
+    virtual void translate(VmExecutable &vmExec) = 0; // Транслирует в машинный код
 
 protected:
     LabelContainer *labelContainer() const;
     void handleError(CompillerError error);
-
-    virtual ByteArray writeExecutable(VmExecutable &vmExec, Address commandAddress) = 0; // Транслирует команду в машинный код
+    void setTranslatedBytes(const ByteArray &translatedBytes);
 
 private:
     CommandData m_data; // Данные команды
+    Address m_address; // Адрес команды
     LabelContainer *m_labelContainer; // Хранилище меток
     ErrorContainer *m_errorContainer; // Хранилище ошибок
-    Listing *m_listing; // Создатель листинга
     bool m_hasError; // Имеет ли команда ошибку
-
-    void writeListing(Address commandAddress, const ByteArray &translatedBytes);
+    ByteArray m_translatedBytes; // Оттранслированные байты команды
 };
 
 #endif //COMMAND_H

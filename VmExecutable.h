@@ -17,8 +17,6 @@ public:
 
     void appendRelativeAddress(Address relative); // Добавляет адрес в таблицу
     void appendBytes(const ByteArray &bytes); // Добавляет массив байт к программе
-    void appendByte(Byte byte); // Добавляет байт к программе (например для однобайтовых команд)
-    void appendZeroBytes(std::size_t count); // Добавляет нулевые байты к программе
 
     bool empty() const; // Проверяет, пуст ли модуль
     void clear(); // Очищает модуль

@@ -2,9 +2,9 @@
 #include "../ErrorsHandling/ErrorContainer.h"
 #include "../Listing/Listing.h"
 
-Command::Command(const CommandData &data, LabelContainer *labelContainer, ErrorContainer *errorContainer,
-                 Listing *listing)
-        : m_data(data), m_labelContainer(labelContainer), m_errorContainer(errorContainer), m_listing(listing)
+Command::Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
+                 ErrorContainer *errorContainer)
+        : m_data(data), m_address(commandAddress), m_labelContainer(labelContainer), m_errorContainer(errorContainer)
 {
 }
 
@@ -13,9 +13,19 @@ const CommandData &Command::data() const
     return m_data;
 }
 
+Address Command::address() const
+{
+    return m_address;
+}
+
 bool Command::hasError() const
 {
     return m_hasError;
+}
+
+ByteArray Command::translatedBytes() const
+{
+    return m_translatedBytes;
 }
 
 LabelContainer *Command::labelContainer() const
@@ -31,19 +41,7 @@ void Command::handleError(CompillerError error)
         m_errorContainer->add(m_data.lineIndex, m_data.sourceLine, error);
 }
 
-void Command::translate(VmExecutable &vmExec, Address commandAddress)
+void Command::setTranslatedBytes(const ByteArray &translatedBytes)
 {
-    if(!hasError())
-    {
-        ByteArray translatedBytes = writeExecutable(vmExec, commandAddress);
-        writeListing(commandAddress, translatedBytes);
-    }
-}
-
-void Command::writeListing(Address commandAddress, const ByteArray &translatedBytes)
-{
-    if(m_listing != nullptr)
-    {
-        // TODO: запись в листинг
-    }
+    m_translatedBytes = translatedBytes;
 }
