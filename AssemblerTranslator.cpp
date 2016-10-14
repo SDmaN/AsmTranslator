@@ -65,13 +65,28 @@ bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
 {
     bool hasError = false;
 
-    for(CommandPointer &command : m_translatedCommands)
+    auto it = std::begin(m_translatedCommands);
+    auto end = std::end(m_translatedCommands);
+    auto lastIt = end - 1;
+
+    while(it != end)
     {
+        CommandPointer command = *it;
+
         if(command)
         {
             command->translate(vmExec);
             hasError |= command->hasError();
+
+            // Последней должна быть директива End и установлен IP
+            if(it == lastIt)
+            {
+                hasError |= vmExec.ipIsSet();
+                handleError(command->data(), CompillerError::IpNotSet);
+            }
         }
+
+        ++it;
     }
 
     return hasError;

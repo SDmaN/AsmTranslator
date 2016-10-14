@@ -21,6 +21,8 @@ public:
     bool empty() const; // Проверяет, пуст ли модуль
     void clear(); // Очищает модуль
 
+    bool ipIsSet() const;
+
     void write(std::ostream &s); // Записывает исполняемый файл в поток
     void write(const std::string &fileName); // Записывает исполняемый файл на диск
 
@@ -28,6 +30,8 @@ private:
     RelativesTable m_relativesTable; // Таблица относительных адресов
     Address m_ip;
     ByteArray m_programBytes; // Машинный код программы
+
+    bool m_ipIsSet;
 };
 
 #endif //VMEXECUTABLE_H

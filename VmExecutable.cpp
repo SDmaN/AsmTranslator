@@ -4,7 +4,7 @@
 #include "ErrorsHandling/Exceptions/FileNotFoundException.h"
 
 VmExecutable::VmExecutable()
-        : m_ip(0)
+        : m_ip(0), m_ipIsSet(false)
 {
 }
 
@@ -15,6 +15,7 @@ Address VmExecutable::ip() const
 
 void VmExecutable::setIp(Address ip)
 {
+    m_ipIsSet = true;
     m_ip = ip;
 }
 
@@ -38,6 +39,12 @@ void VmExecutable::clear()
     m_programBytes.clear();
     m_relativesTable.clear();
     m_ip = 0;
+    m_ipIsSet = false;
+}
+
+bool VmExecutable::ipIsSet() const
+{
+    return m_ipIsSet;
 }
 
 void VmExecutable::write(std::ostream &s)

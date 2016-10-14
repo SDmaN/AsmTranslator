@@ -12,7 +12,8 @@ enum CompillerError
     TooFewArguments = 32,
     ArgumentIncorrect = 64,
     LabelNotFound = 128,
-    LabelAlreadyDefined = 256
+    LabelAlreadyDefined = 256,
+    IpNotSet = 512
 };
 
 #endif //COMPILLERERROR_H
