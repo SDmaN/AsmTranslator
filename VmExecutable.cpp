@@ -62,8 +62,8 @@ void VmExecutable::write(const std::string &fileName)
 {
     std::fstream file(fileName);
 
-    if(file.is_open())
-        write(file);
+    if(!file.is_open())
+        throw FileNotFoundException("Не удалось открыть файл " + fileName);
 
-    throw FileNotFoundException("Не удалось открыть файл " + fileName);
+    write(file);
 }
