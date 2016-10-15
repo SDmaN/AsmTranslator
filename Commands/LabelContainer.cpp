@@ -3,7 +3,7 @@
 bool LabelContainer::contains(const std::string &label) const
 {
     auto it = m_container.find(label);
-    return it != std::end(m_container);
+    return it != m_container.end();
 }
 
 void LabelContainer::add(const std::pair<std::string, Address> &element)

@@ -20,11 +20,14 @@ void LabelCommand::translate(VmExecutable &vmExec)
 
 void LabelCommand::addLabel(const CommandData &data)
 {
-    if(labelContainer()->contains(data.arg))
+    if(!data.label.empty())
     {
-        handleError(CompillerError::LabelAlreadyDefined);
-        return;
-    }
+        if(labelContainer()->contains(data.label))
+        {
+            handleError(CompillerError::LabelAlreadyDefined);
+            return;
+        }
 
-    labelContainer()->add(std::make_pair(data.arg, address()));
+        labelContainer()->add(std::make_pair(data.label, address()));
+    }
 }

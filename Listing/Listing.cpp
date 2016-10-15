@@ -8,26 +8,30 @@ void Listing::clear()
     m_listingText.clear();
 }
 
-void Listing::appendLine(const CommandData &cmdData, Address commandAddress, const ByteArray &translatedBytes)
+void Listing::generate(const std::vector<CommandPointer> &commands)
 {
-    if(!cmdData.empty())
-    {
-        std::stringstream ss;
-
-        ss << cmdData.lineIndex << ":\t";
-        ss << std::hex << commandAddress << '\t';
-
-        for(auto b : translatedBytes)
-            ss << std::hex << static_cast<short>(b);
-
-        ss << '\t';
-        ss << cmdData.sourceLine << std::endl;
-
-        m_listingText += ss.str();
-    }
+    for(auto &command : commands)
+        appendLine(command->data(), command->address(), command->translatedBytes());
 }
 
-const std::string &Listing::listingText() const
+void Listing::appendLine(const CommandData &cmdData, Address commandAddress, const ByteArray &translatedBytes)
 {
-    return m_listingText;
+    std::stringstream ss;
+
+    ss << cmdData.lineIndex << ":\t";
+    ss << std::hex << commandAddress << '\t';
+
+    for(auto b : translatedBytes)
+        ss << std::hex << static_cast<short>(b);
+
+    ss << '\t';
+    ss << cmdData.sourceLine << std::endl;
+
+    m_listingText += ss.str();
+}
+
+std::ostream &operator<<(std::ostream &stream, const Listing &listing)
+{
+    stream << listing.m_listingText;
+    return stream;
 }

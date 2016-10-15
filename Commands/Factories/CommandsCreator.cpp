@@ -8,6 +8,7 @@ CommandFactory<AllocateCommand<Float>> CommandsCreator::m_fltAllocateCommandFact
 CommandFactory<EndCommand> CommandsCreator::m_endCommandFactory;
 CommandFactory<UnknownCommand> CommandsCreator::m_unknownCommandFactory;
 CommandFactory<LabelCommand> CommandsCreator::m_labelCommandFactory;
+CommandFactory<EmptyCommand> CommandsCreator::m_emptyCommandFactory;
 
 std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories = {
         { "Nop",        &m_shortProcessorCommandFactory },
@@ -77,6 +78,9 @@ CommandPointer
 CommandsCreator::create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer,
                         ErrorContainer *errorContainer) const
 {
+    if(cmdData.label.empty() && cmdData.code.empty() && cmdData.arg.empty())
+        return m_emptyCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
+
     if(cmdData.code.empty() && !cmdData.label.empty())
         return m_labelCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
 

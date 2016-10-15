@@ -1,5 +1,10 @@
 #include "ErrorContainer.h"
 
+ErrorContainer::ErrorContainer()
+{
+    clear();
+}
+
 void ErrorContainer::add(const Error &error)
 {
     m_errors.push_back(error);
@@ -7,7 +12,7 @@ void ErrorContainer::add(const Error &error)
 
 void ErrorContainer::add(std::size_t lineIndex, const std::string &sourceLine, CompillerError errorCode)
 {
-    m_errors.push_back(Error(lineIndex, sourceLine, errorCode));
+    add(Error(lineIndex, sourceLine, errorCode));
 }
 
 void ErrorContainer::clear()

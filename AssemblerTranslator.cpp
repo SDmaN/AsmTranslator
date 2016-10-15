@@ -81,8 +81,10 @@ bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
             // Последней должна быть директива End и установлен IP
             if(it == lastIt)
             {
-                hasError |= vmExec.ipIsSet();
-                handleError(command->data(), CompillerError::IpNotSet);
+                hasError |= !vmExec.ipIsSet();
+
+                if(!vmExec.ipIsSet())
+                    handleError(command->data(), CompillerError::IpNotSet);
             }
         }
 

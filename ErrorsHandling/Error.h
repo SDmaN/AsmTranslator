@@ -2,6 +2,7 @@
 #define ERROR_H
 
 #include <string>
+#include <ostream>
 #include "CompillerError.h"
 
 // Представляет ошибку
@@ -25,5 +26,7 @@ private:
     std::string m_sourceLine; // Исходная строка
     CompillerError m_errorCode; // Код ошибки
 };
+
+std::ostream &operator<<(std::ostream &stream, const Error &error);
 
 #endif //ERROR_H
