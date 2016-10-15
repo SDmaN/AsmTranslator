@@ -1,5 +1,5 @@
 #include "CommandsCreator.h"
-#include "../../ErrorsHandling/ErrorContainer.h"
+#include "../../ErrorsHandling/ErrorsContainer.h"
 
 CommandFactory<ShortProcessorCommand> CommandsCreator::m_shortProcessorCommandFactory;
 CommandFactory<LongProcessorCommand> CommandsCreator::m_longProcessorCommandFactory;
@@ -75,19 +75,18 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
 // ============================================
 
 CommandPointer
-CommandsCreator::create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer,
-                        ErrorContainer *errorContainer) const
+CommandsCreator::create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer) const
 {
     if(cmdData.label.empty() && cmdData.code.empty() && cmdData.arg.empty())
-        return m_emptyCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
+        return m_emptyCommandFactory.create(cmdData, commandAddress, labelContainer);
 
     if(cmdData.code.empty() && !cmdData.label.empty())
-        return m_labelCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
+        return m_labelCommandFactory.create(cmdData, commandAddress, labelContainer);
 
     auto factoriesIt = m_commandFactories.find(cmdData.code);
 
     if(factoriesIt == std::end(m_commandFactories))
-        return m_unknownCommandFactory.create(cmdData, commandAddress, labelContainer, errorContainer);
+        return m_unknownCommandFactory.create(cmdData, commandAddress, labelContainer);
 
-    return factoriesIt->second->create(cmdData, commandAddress, labelContainer, errorContainer);
+    return factoriesIt->second->create(cmdData, commandAddress, labelContainer);
 }

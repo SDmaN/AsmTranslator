@@ -38,6 +38,7 @@ void Error::setErrorCode(CompillerError errorCode)
 std::ostream &operator<<(std::ostream &stream, const Error &error)
 {
     stream << error.lineIndex() << ": ";
+    stream << error.sourceLine() << std::endl;
 
     switch(error.errorCode())
     {

@@ -1,9 +1,8 @@
 #include "LabelCommand.h"
 #include "LabelContainer.h"
 
-LabelCommand::LabelCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                           ErrorContainer *errorContainer)
-        : Command(data, commandAddress, labelContainer, errorContainer)
+LabelCommand::LabelCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : Command(data, commandAddress, labelContainer)
 {
     addLabel(data);
 }

@@ -27,6 +27,7 @@ private:
     CompillerError m_errorCode; // Код ошибки
 };
 
+// Вывод в поток
 std::ostream &operator<<(std::ostream &stream, const Error &error);
 
 #endif //ERROR_H

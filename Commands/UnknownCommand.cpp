@@ -1,9 +1,8 @@
 #include "UnknownCommand.h"
 
-UnknownCommand::UnknownCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                               ErrorContainer *errorContainer)
-        : Command(data, commandAddress, labelContainer, errorContainer),
-          m_labelCommand(data, commandAddress, labelContainer, errorContainer)
+UnknownCommand::UnknownCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : Command(data, commandAddress, labelContainer),
+          m_labelCommand(data, commandAddress, labelContainer)
 {
 }
 

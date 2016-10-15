@@ -21,7 +21,7 @@ public:
     bool empty() const; // Проверяет, пуст ли модуль
     void clear(); // Очищает модуль
 
-    bool ipIsSet() const;
+    bool ipIsSet() const; // Проверяет, установлен ли IP
 
     void write(std::ostream &s); // Записывает исполняемый файл в поток
     void write(const std::string &fileName); // Записывает исполняемый файл на диск
@@ -31,7 +31,7 @@ private:
     Address m_ip;
     ByteArray m_programBytes; // Машинный код программы
 
-    bool m_ipIsSet;
+    bool m_ipIsSet; // Определяет, установлен ли IP
 };
 
 #endif //VMEXECUTABLE_H

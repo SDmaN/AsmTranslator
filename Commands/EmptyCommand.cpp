@@ -1,8 +1,7 @@
 #include "EmptyCommand.h"
 
-EmptyCommand::EmptyCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                           ErrorContainer *errorContainer)
-        : Command(data, commandAddress, labelContainer, errorContainer)
+EmptyCommand::EmptyCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : Command(data, commandAddress, labelContainer)
 {
 }
 

@@ -4,10 +4,9 @@
 #include "../LabelContainer.h"
 #include "../../Utils/Utils.h"
 
-LongProcessorCommand::LongProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                                           ErrorContainer *errorContainer)
-        : ProcessorCommand(data, commandAddress, labelContainer, errorContainer),
-          m_labelCommand(data, commandAddress, labelContainer, errorContainer)
+LongProcessorCommand::LongProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : ProcessorCommand(data, commandAddress, labelContainer),
+          m_labelCommand(data, commandAddress, labelContainer)
 {
 }
 

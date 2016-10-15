@@ -5,7 +5,3 @@ CommandData::CommandData()
 {
 }
 
-bool CommandData::empty() const
-{
-    return label.empty() && code.empty() && comment.empty();
-}

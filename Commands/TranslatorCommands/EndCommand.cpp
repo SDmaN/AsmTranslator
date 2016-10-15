@@ -2,10 +2,9 @@
 #include "EndCommand.h"
 #include "../LabelContainer.h"
 
-EndCommand::EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                       ErrorContainer *errorContainer)
-        : Command(data, commandAddress, labelContainer, errorContainer),
-          m_labelCommand(data, commandAddress, labelContainer, errorContainer)
+EndCommand::EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : Command(data, commandAddress, labelContainer),
+          m_labelCommand(data, commandAddress, labelContainer)
 {
     parseArg();
 }

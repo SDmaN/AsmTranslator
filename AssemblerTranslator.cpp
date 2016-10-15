@@ -1,9 +1,8 @@
 #include "AssemblerTranslator.h"
-#include "ErrorsHandling/ErrorContainer.h"
 #include "Listing/Listing.h"
+#include <iostream>
 
-AssemblerTranslator::AssemblerTranslator(ErrorContainer *errorContainer)
-    : m_errorContainer(errorContainer)
+AssemblerTranslator::AssemblerTranslator()
 {
 }
 
@@ -28,12 +27,12 @@ const std::vector<CommandPointer> &AssemblerTranslator::translatedCommands() con
 
 CommandPointer AssemblerTranslator::createCommand(const CommandData &cmdData, Address commandAddress) const
 {
-    return m_commandsCreator.create(cmdData, commandAddress, const_cast<LabelContainer *>(&m_labels), m_errorContainer);
+    return m_commandsCreator.create(cmdData, commandAddress, const_cast<LabelContainer *>(&m_labels));
 }
 
-void AssemblerTranslator::handleError(const CommandData &cmdData, CompillerError error)
+void AssemblerTranslator::handleError(CommandData &cmdData, CompillerError errorCode)
 {
-    m_errorContainer->add(cmdData.lineIndex, cmdData.sourceLine, error);
+    cmdData.errors.add(cmdData, errorCode);
 }
 
 bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
@@ -45,17 +44,9 @@ bool AssemblerTranslator::firstPass(const std::vector<CommandData> &cmdsData)
     {
         CommandPointer command = createCommand(cmdData, currentCommandAddress);
 
-        if(command)
-        {
-            currentCommandAddress += command->size();
-            hasError |= command->hasError(); // Сама ошибка обработана командой
-            m_translatedCommands.push_back(command);
-        }
-        else
-        { // Нашли неверную команду
-            hasError = true;
-            handleError(cmdData, CompillerError::CommandNotFound);
-        }
+        currentCommandAddress += command->size();
+        hasError |= command->hasError(); // Сама ошибка обработана командой
+        m_translatedCommands.push_back(command);
     }
 
     return hasError;
@@ -72,20 +63,17 @@ bool AssemblerTranslator::secondPass(VmExecutable &vmExec)
     while(it != end)
     {
         CommandPointer command = *it;
+        auto c = command.get();
+        command->translate(vmExec);
+        hasError |= command->hasError();
 
-        if(command)
+        // Последней должна быть директива End и установлен IP
+        if(it == lastIt)
         {
-            command->translate(vmExec);
-            hasError |= command->hasError();
+            hasError |= !vmExec.ipIsSet();
 
-            // Последней должна быть директива End и установлен IP
-            if(it == lastIt)
-            {
-                hasError |= !vmExec.ipIsSet();
-
-                if(!vmExec.ipIsSet())
-                    handleError(command->data(), CompillerError::IpNotSet);
-            }
+            if(!vmExec.ipIsSet())
+                handleError(command->data(), CompillerError::IpNotSet);
         }
 
         ++it;

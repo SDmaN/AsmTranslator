@@ -1,14 +1,17 @@
 #include "Command.h"
-#include "../ErrorsHandling/ErrorContainer.h"
 #include "../Listing/Listing.h"
 
-Command::Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                 ErrorContainer *errorContainer)
-        : m_data(data), m_address(commandAddress), m_labelContainer(labelContainer), m_errorContainer(errorContainer)
+Command::Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+        : m_data(data), m_address(commandAddress), m_labelContainer(labelContainer), m_hasError(false)
 {
 }
 
 const CommandData &Command::data() const
+{
+    return m_data;
+}
+
+CommandData &Command::data()
 {
     return m_data;
 }
@@ -36,9 +39,7 @@ LabelContainer *Command::labelContainer() const
 void Command::handleError(CompillerError error)
 {
     m_hasError = true;
-
-    if(m_errorContainer != nullptr)
-        m_errorContainer->add(m_data.lineIndex, m_data.sourceLine, error);
+    m_data.errors.add(m_data, error);
 }
 
 void Command::setTranslatedBytes(const ByteArray &translatedBytes)

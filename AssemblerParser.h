@@ -7,12 +7,10 @@
 #include "Commands/CommandData.h"
 #include "ErrorsHandling/CompillerError.h"
 
-class ErrorContainer;
-
 class AssemblerParser
 {
 public:
-    explicit AssemblerParser(ErrorContainer *errorContainer = nullptr);
+    explicit AssemblerParser();
 
     std::vector<CommandData> parse(std::istream &stream, bool *hasErrors = nullptr); // Парсит исходный текст из потока
     std::vector<CommandData> parse(const std::string &fileName, bool *hasErrors = nullptr); // Парсит исходный текст из файла
@@ -48,8 +46,6 @@ private:
     // Тип функции-обработчика состояния
     typedef std::function<State(char,CommandData&,bool*)> StateHandler;
 
-    ErrorContainer *m_errorContainer; // Контейнер для ошибок
-
     const std::size_t StatesCount = 9; // Количество состояний
     std::vector<StateHandler> m_stateHandlers; // Обработчики состояний
 
@@ -63,17 +59,17 @@ private:
     SymbolType getSymbolType(char symbol) const; // Возвращает тип символа
 
     // Функции-обработчики состояний
-    State handleStart(char symbol, CommandData &opData, bool *hasError) const;
-    State handleId(char symbol, CommandData &opData, bool *hasError) const;
-    State handleIdEnding(char symbol, CommandData &opData, bool *hasError) const;
-    State handleCodeWaiting(char symbol, CommandData &opData, bool *hasError) const;
-    State handleCode(char symbol, CommandData &opData, bool *hasError) const;
-    State handleArgWaiting(char symbol, CommandData &opData, bool *hasError) const;
-    State handleArg(char symbol, CommandData &opData, bool *hasError) const;
-    State handleComment(char symbol, CommandData &opData, bool *hasError) const;
+    State handleStart(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleId(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleIdEnding(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleCodeWaiting(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleCode(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleArgWaiting(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleArg(char symbol, CommandData &cmdData, bool *hasError) const;
+    State handleComment(char symbol, CommandData &cmdData, bool *hasError) const;
 
     // Сохраняет информацию об ошибке в операторе (код ошибки, номер ошибочного символа)
-    void saveErrorData(CommandData &opData, CompillerError error) const;
+    void saveErrorData(CommandData &cmdData, CompillerError errorCode) const;
 };
 
 #endif //ASSEMBLERPARSER_H

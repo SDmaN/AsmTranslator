@@ -8,8 +8,7 @@
 class EndCommand : public Command
 {
 public:
-    EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                   ErrorContainer *errorContainer);
+    EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer);
 
     virtual size_t size() const override; // Возвращает размер
     virtual void translate(VmExecutable &vmExec) override; // Транслирует команду (вставляет Stop)

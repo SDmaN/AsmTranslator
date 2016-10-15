@@ -6,8 +6,7 @@
 class LabelCommand : public Command
 {
 public:
-    LabelCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                     ErrorContainer *errorContainer);
+    LabelCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer);
 
     virtual size_t size() const override;
     virtual void translate(VmExecutable &vmExec) override;

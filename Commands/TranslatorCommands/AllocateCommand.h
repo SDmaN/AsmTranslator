@@ -3,7 +3,6 @@
 
 #include <regex>
 #include <iterator>
-#include <cstdlib>
 
 #include "../Command.h"
 #include "../LabelCommand.h"
@@ -15,10 +14,9 @@ template<typename AllocatingItemType>
 class AllocateCommand : public Command
 {
 public:
-    AllocateCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                        ErrorContainer *errorContainer)
-            : Command(data, commandAddress, labelContainer, errorContainer),
-              m_labelCommand(data, commandAddress, labelContainer, errorContainer)
+    AllocateCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
+            : Command(data, commandAddress, labelContainer),
+              m_labelCommand(data, commandAddress, labelContainer)
     {
         parseArg(data.arg);
     }
@@ -146,7 +144,7 @@ private:
 
         if(std::regex_search(arg, match, arraySizeRegex))
         {
-            m_allocatingItemsCount = std::atoi(match.begin()->str().c_str());
+            m_allocatingItemsCount = static_cast<std::size_t>(std::stof(match.begin()->str().c_str()));
             m_commandSize = m_allocatingItemsCount * sizeof(AllocatingItemType);
         }
     }
@@ -159,7 +157,7 @@ private:
 
         while(std::regex_search(arg, match, numberRegex))
         {
-            m_allocatingItems.push_back(std::atof(match.begin()->str().c_str()));
+            m_allocatingItems.push_back(static_cast<AllocatingItemType>(std::stof(match.begin()->str().c_str())));
             arg = match.suffix();
         }
     }

@@ -11,20 +11,18 @@
 class AssemblerTranslator
 {
 public:
-    AssemblerTranslator(ErrorContainer *errorContainer);
+    AssemblerTranslator();
     VmExecutable translate(const std::vector<CommandData> &cmdsData); // Транслирует операторы в модуль
     const std::vector<CommandPointer> &translatedCommands() const;
 
 private:
     CommandsCreator m_commandsCreator; // Создатель команд
-
     LabelContainer m_labels; // Хранилище меток
-    ErrorContainer *m_errorContainer; // Хранилище ошибок
 
     std::vector<CommandPointer> m_translatedCommands; // Команды, собранные в первом проходе
 
     CommandPointer createCommand(const CommandData &cmdData, Address commandAddress) const; // Создает команду
-    void handleError(const CommandData &cmdData, CompillerError error);
+    void handleError(CommandData &cmdData, CompillerError errorCode);
 
     bool firstPass(const std::vector<CommandData> &cmdsData); // Первый проход
     bool secondPass(VmExecutable &vmExec); // Второй проход

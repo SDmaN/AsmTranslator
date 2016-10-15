@@ -14,16 +14,16 @@ class Command;
 typedef std::shared_ptr<Command> CommandPointer;
 
 class LabelContainer;
-class ErrorContainer;
+class ErrorsContainer;
 
 // Абстрактный класс команды процессора или ассемблера
 class Command
 {
 public:
-    Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                ErrorContainer *errorContainer);
+    Command(const CommandData &data, Address commandAddress, LabelContainer *labelContainer);
 
     const CommandData &data() const; // Возвращает данные команды
+    CommandData &data();
     Address address() const;
 
     bool hasError() const; // Проверяет, содержит ли команда ошибку
@@ -41,7 +41,6 @@ private:
     CommandData m_data; // Данные команды
     Address m_address; // Адрес команды
     LabelContainer *m_labelContainer; // Хранилище меток
-    ErrorContainer *m_errorContainer; // Хранилище ошибок
     bool m_hasError; // Имеет ли команда ошибку
     ByteArray m_translatedBytes; // Оттранслированные байты команды
 };

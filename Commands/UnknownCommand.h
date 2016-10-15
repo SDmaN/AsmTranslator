@@ -8,11 +8,9 @@
 class UnknownCommand : public Command
 {
 public:
-    UnknownCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer,
-                       ErrorContainer *errorContainer);
+    UnknownCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer);
 
     virtual size_t size() const override;
-
     virtual void translate(VmExecutable &vmExec) override;
 
 private:

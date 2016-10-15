@@ -5,14 +5,17 @@
 #include <string>
 #include "Error.h"
 
+class CommandData;
+
 // Класс, собирающий ошибки транслятора
-class ErrorContainer
+class ErrorsContainer
 {
 public:
-    ErrorContainer();
+    ErrorsContainer();
 
     void add(const Error &error);
     void add(std::size_t lineIndex, const std::string &sourceLine, CompillerError errorCode);
+    void add(const CommandData &cmdData, CompillerError errorCode);
     void clear();
 
     const std::vector<Error> &errors() const;
