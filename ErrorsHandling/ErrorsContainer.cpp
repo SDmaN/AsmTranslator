@@ -30,3 +30,8 @@ const std::vector<Error> &ErrorsContainer::errors() const
 {
     return m_errors;
 }
+
+bool ErrorsContainer::empty() const
+{
+    return m_errors.empty();
+}

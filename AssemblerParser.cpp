@@ -3,7 +3,7 @@
 #include "AssemblerParser.h"
 #include "ErrorsHandling/Exceptions/FileNotFoundException.h"
 
-const std::string FileNotFoundMessage = "Файл не найден";
+const std::string FileNotFoundMessage = "Не удалось открыть исходный файл.";
 
 AssemblerParser::AssemblerParser()
 {
@@ -35,14 +35,18 @@ std::vector<CommandData> AssemblerParser::parse(std::istream &stream, bool *hasE
     return result;
 }
 
+#include <iostream>
+
 std::vector<CommandData> AssemblerParser::parse(const std::string &fileName, bool *hasErrors)
 {
-    std::fstream sourceFile(fileName);
+    std::ifstream sourceFile(fileName);
 
     if(sourceFile.is_open())
         return parse(sourceFile, hasErrors);
 
-    *hasErrors = true;
+    if(hasErrors != nullptr)
+        *hasErrors = true;
+
     throw FileNotFoundException(FileNotFoundMessage);
 }
 

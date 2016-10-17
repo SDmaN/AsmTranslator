@@ -60,7 +60,7 @@ void VmExecutable::write(std::ostream &s)
 
 void VmExecutable::write(const std::string &fileName)
 {
-    std::fstream file(fileName);
+    std::ofstream file(fileName, std::ios::binary | std::ofstream::out);
 
     if(!file.is_open())
         throw FileNotFoundException("Не удалось открыть файл " + fileName);

@@ -17,6 +17,7 @@ public:
     void add(std::size_t lineIndex, const std::string &sourceLine, CompillerError errorCode);
     void add(const CommandData &cmdData, CompillerError errorCode);
     void clear();
+    bool empty() const; // Проверяет, пусь ди контейнер
 
     const std::vector<Error> &errors() const;
 
