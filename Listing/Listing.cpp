@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iomanip>
 
 #include "Listing.h"
 #include "../Commands/CommandData.h"
@@ -11,21 +12,31 @@ void Listing::clear()
 void Listing::generate(const std::vector<CommandPointer> &commands)
 {
     for(auto &command : commands)
-        appendLine(command->data(), command->address(), command->translatedBytes());
+        appendLine(command);
 }
 
-void Listing::appendLine(const CommandData &cmdData, Address commandAddress, const ByteArray &translatedBytes)
+void Listing::appendLine(const CommandPointer &command)
 {
     std::stringstream ss;
 
-    ss << cmdData.lineIndex << ":\t";
-    ss << std::hex << commandAddress << '\t';
+    CommandData cmdData = command->data();
 
-    for(auto b : translatedBytes)
-        ss << std::hex << static_cast<short>(b);
+    ss << cmdData.lineIndex << ": ";
 
-    ss << '\t';
+    auto oldFlags = ss.flags();
+
+    ss << std::hex << command->address() << '\t';
+
+    for(auto b : command->translatedBytes())
+        ss << static_cast<short>(b);
+
+    ss.flags(oldFlags);
+
+    ss << "\t\t";
     ss << cmdData.sourceLine << std::endl;
+
+    for(auto &error : cmdData.errors.errors())
+        ss << error << std::endl;
 
     m_listingText += ss.str();
 }

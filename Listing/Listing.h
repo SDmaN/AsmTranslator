@@ -20,7 +20,7 @@ public:
 
 private:
     std::string m_listingText;
-    void appendLine(const CommandData &cmdData, Address commandAddress, const ByteArray &translatedBytes);
+    void appendLine(const CommandPointer &command);
 };
 
 #endif //LISTINGMAKER_H
