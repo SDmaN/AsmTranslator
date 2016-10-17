@@ -26,7 +26,7 @@ void VmExecutable::appendRelativeAddress(Address relative)
 
 void VmExecutable::appendBytes(const ByteArray &bytes)
 {
-    m_programBytes.insert(std::begin(m_programBytes), std::begin(bytes), std::end(bytes));
+    m_programBytes.insert(std::end(m_programBytes), std::begin(bytes), std::end(bytes));
 }
 
 bool VmExecutable::empty() const
@@ -53,6 +53,9 @@ void VmExecutable::write(std::ostream &s)
 
     std::size_t relativeTableSize = m_relativesTable.size();
     s.write(reinterpret_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
+
+    for(Address address : m_relativesTable)
+        s.write(reinterpret_cast<char *>(&address), sizeof(address));
 
     for(Byte b : m_programBytes)
         s.write(&b, sizeof(b));

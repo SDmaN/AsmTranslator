@@ -25,6 +25,7 @@ void EndCommand::translate(VmExecutable &vmExec)
 
         vmExec.setIp(m_ip);
         vmExec.appendBytes(result);
+        vmExec.appendRelativeAddress(address() + sizeof(m_stopCommandCode));
     }
 
     setTranslatedBytes(result);
