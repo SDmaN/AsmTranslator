@@ -19,6 +19,7 @@ public:
     virtual CommandPointer
     create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer) const override // Создает конкретную команду
     {
+        // Команда должна поддерживать такой конструктор:
         CommandPointer result(new CommandType(cmdData, commandAddress, labelContainer));
         return result;
     }

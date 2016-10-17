@@ -10,16 +10,18 @@
 
 using namespace std;
 
+// Строки
 const string fileNotFound = "Не удалось открыть файл:";
 const string execExtension = "vmexec";
 const string errorsFileName = "errors.txt";
 const string listingFileName = "listing.txt";
 
+// Преобразует массив аргументов cmd к вектору
 template<typename IteratorType>
 vector<string> getCommandLineArguments(IteratorType begin, IteratorType end);
-string getSourceFileName(const vector<string> &commandLineArgs);
-string getExecFileName(const string &sourceFileName);
-bool listingArgExists(const vector<string> &commandLineArgs);
+string getSourceFileName(const vector<string> &commandLineArgs); // Вытаскивает из аргументов исходный файл
+string getExecFileName(const string &sourceFileName); // На основе исходного файла, составляет выходной (заменяет расширение)
+bool listingArgExists(const vector<string> &commandLineArgs); // Проверяет, есть ли среди аргментов листинг
 
 int main(int argc, char *argv[])
 {

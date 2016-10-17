@@ -1,6 +1,7 @@
 #include "CommandsCreator.h"
 #include "../../ErrorsHandling/ErrorsContainer.h"
 
+// Определение фабрик
 CommandFactory<ShortProcessorCommand> CommandsCreator::m_shortProcessorCommandFactory;
 CommandFactory<LongProcessorCommand> CommandsCreator::m_longProcessorCommandFactory;
 CommandFactory<AllocateCommand<Dword>> CommandsCreator::m_dwAllocateCommandFactory;
@@ -10,7 +11,9 @@ CommandFactory<UnknownCommand> CommandsCreator::m_unknownCommandFactory;
 CommandFactory<LabelCommand> CommandsCreator::m_labelCommandFactory;
 CommandFactory<EmptyCommand> CommandsCreator::m_emptyCommandFactory;
 
+// Словарь с фабриками
 std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories = {
+        // Короткие команды процессора
         { "Nop",        &m_shortProcessorCommandFactory },
         { "Stop",       &m_shortProcessorCommandFactory },
         { "ItF",        &m_shortProcessorCommandFactory },
@@ -21,6 +24,7 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
         { "OutF",       &m_shortProcessorCommandFactory },
         { "Ret",        &m_shortProcessorCommandFactory },
 
+        // Длинные команды процессора
         { "AddI",       &m_longProcessorCommandFactory },
         { "AddIR",      &m_longProcessorCommandFactory },
         { "SubI",       &m_longProcessorCommandFactory },
@@ -67,6 +71,7 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
         { "JgeR",       &m_longProcessorCommandFactory },
         { "Call",       &m_longProcessorCommandFactory },
 
+        // Директивы
         { "AllocDword", &m_dwAllocateCommandFactory },
         { "AllocFloat", &m_fltAllocateCommandFactory },
         { "End",        &m_endCommandFactory }
