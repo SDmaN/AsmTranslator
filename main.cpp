@@ -101,7 +101,6 @@ bool listingArgExists(const vector<string> &commandLineArgs)
 {
     for(int i = 2; i < commandLineArgs.size(); ++i)
     {
-        cout << commandLineArgs[i] << endl;
         if(commandLineArgs[i] == "-l")
             return true;
     }
