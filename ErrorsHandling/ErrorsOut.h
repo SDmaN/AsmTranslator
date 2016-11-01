@@ -7,7 +7,7 @@
 #include "../Commands/Command.h"
 #include "Error.h"
 
-// Собирает все ошибки и выводит их в поток
+// Собирает все ошибки транслятора и выводит их в поток
 class ErrorsOut
 {
 public:

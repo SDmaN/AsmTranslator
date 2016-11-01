@@ -9,6 +9,10 @@
 class Error
 {
 public:
+    // Конструктор инициализации
+    // lineIndex - номер строки
+    // sourceLine - строка в которой ошибка
+    // errorCode - код ошибки
     Error(size_t lineIndex, const std::string &sourceLine, CompillerError errorCode);
 
     // Геттеры и сеттеры для полей
@@ -28,6 +32,7 @@ private:
 };
 
 // Вывод в поток
+// Выводит текстовое пояснение для кода ошибки
 std::ostream &operator<<(std::ostream &stream, const Error &error);
 
 #endif //ERROR_H

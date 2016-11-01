@@ -7,6 +7,16 @@
 #include "Commands/CommandData.h"
 #include "ErrorsHandling/CompillerError.h"
 
+/*
+ * Парсер основного текста программы
+ * Разбивает на:
+ * метку
+ * код операции
+ * аргументы
+ *
+ * Аргументы записываются как обычная срока.
+ * Свои аргументы каждая команда разбирает сама.
+ */
 class AssemblerParser
 {
 public:
@@ -19,32 +29,32 @@ private:
     // Состояния
     enum State
     {
-        Start = 0,
-        Id,
-        IdEnding,
-        CodeWaiting,
-        Code,
-        ArgWaiting,
-        Arg,
-        Comment,
-        End
+        Start = 0, // Начальное состояние
+        Id, // Нашли метку или код команды
+        IdEnding, // Метка или код закончился (тут определяется, что это было)
+        CodeWaiting, // Id оказалась меткой, ждем код (пропускаем пробелы)
+        Code, // Собираем код
+        ArgWaiting, // Ждем аргументы (пропускаем пробелы)
+        Arg, // Собираем аргумент
+        Comment, // Собираем комментарий
+        End // Конечное состояние
     };
 
     // Типы символа
     enum SymbolType
     {
-        Unknown,
-        Space,
-        Colon,
-        CommentSeparator,
-        Digit,
-        Alpha,
-        Underline,
-        LineEnd
+        Unknown, // Неизвестный
+        Space, // Пробел или табуляция
+        Colon, // Двоеточие
+        CommentSeparator, // Символ комментария ';'
+        Digit, // Цифра
+        Alpha, // Буква
+        Underline, // Нижнее подчеркивание
+        LineEnd // Конец строки
     };
 
     // Тип функции-обработчика состояния
-    typedef std::function<State(char,CommandData&,bool*)> StateHandler;
+    typedef std::function<State(char,CommandData&)> StateHandler;
 
     const std::size_t StatesCount = 9; // Количество состояний
     std::vector<StateHandler> m_stateHandlers; // Обработчики состояний
@@ -54,22 +64,25 @@ private:
     State m_currentState; // Текущее состояние
 
     void initHandlers(); // Инициализирует функции-обработчики
-    CommandData parseLine(const std::string &line, bool *hasError); // Парсит исходную строку
+    CommandData parseLine(const std::string &line); // Парсит исходную строку
 
     SymbolType getSymbolType(char symbol) const; // Возвращает тип символа
 
     // Функции-обработчики состояний
-    State handleStart(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleId(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleIdEnding(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleCodeWaiting(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleCode(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleArgWaiting(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleArg(char symbol, CommandData &cmdData, bool *hasError) const;
-    State handleComment(char symbol, CommandData &cmdData, bool *hasError) const;
+    AssemblerParser::State handleStart(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleId(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleIdEnding(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleCodeWaiting(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleCode(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleArgWaiting(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleArg(char symbol, CommandData &cmdData) const;
+    AssemblerParser::State handleComment(char symbol, CommandData &cmdData) const;
 
     // Сохраняет информацию об ошибке в операторе (код ошибки, номер ошибочного символа)
     void saveErrorData(CommandData &cmdData, CompillerError errorCode) const;
+
+    // Выбрасывает исключение с ошибкой
+    void throwTranslationException(CompillerError errorCode) const;
 };
 
 #endif //ASSEMBLERPARSER_H

@@ -2,6 +2,8 @@
 
 #include "AssemblerParser.h"
 #include "ErrorsHandling/Exceptions/FileNotFoundException.h"
+#include "ErrorsHandling/Exceptions/TranslationException.h"
+#include "ErrorsHandling/Error.h"
 
 const std::string FileNotFoundMessage = "Не удалось открыть исходный файл.";
 
@@ -12,22 +14,23 @@ AssemblerParser::AssemblerParser()
 
 std::vector<CommandData> AssemblerParser::parse(std::istream &stream, bool *hasErrors)
 {
-    std::vector<CommandData> result;
-    std::string line;
-    m_currentLineIndex = 0;
+    std::vector<CommandData> result; // Результирующий вектор с данными команд
+    std::string line; // Считанная строка файла
+    m_currentLineIndex = 0; // Номер текущей строки
 
     while(!stream.eof())
     {
-        std::getline(stream, line);
-
-        bool err = false;
-        CommandData cmdData = parseLine(line, &err);
-
-        if(hasErrors != nullptr)
-            *hasErrors = err;
-
-        //if(!(cmdData.code.empty() && cmdData.label.empty() && cmdData.comment.empty() && err))
-        result.push_back(cmdData);
+        try
+        {
+            std::getline(stream, line); // Считываем очередную строку
+            CommandData cmdData = parseLine(line); // Разбиваем ее
+            result.push_back(cmdData); // Сохраняем результат
+        }
+        catch(TranslationException &ex)
+        {
+            if(hasErrors != nullptr)
+                *hasErrors = true;
+        }
 
         ++m_currentLineIndex;
     }
@@ -35,15 +38,14 @@ std::vector<CommandData> AssemblerParser::parse(std::istream &stream, bool *hasE
     return result;
 }
 
-#include <iostream>
-
 std::vector<CommandData> AssemblerParser::parse(const std::string &fileName, bool *hasErrors)
 {
-    std::ifstream sourceFile(fileName);
+    std::ifstream sourceFile(fileName); // Открываем файл из которого читать
 
     if(sourceFile.is_open())
         return parse(sourceFile, hasErrors);
 
+    // По каким-то причинам не удалось открыть
     if(hasErrors != nullptr)
         *hasErrors = true;
 
@@ -54,31 +56,45 @@ void AssemblerParser::initHandlers()
 {
     m_stateHandlers.resize(StatesCount);
 
-    m_stateHandlers[Start] = std::bind(handleStart, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[Id] = std::bind(handleId, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[IdEnding] = std::bind(handleIdEnding, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[Code] = std::bind(handleCode, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[CodeWaiting] = std::bind(handleCodeWaiting, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[ArgWaiting] = std::bind(handleArgWaiting, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[Arg] = std::bind(handleArg, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    m_stateHandlers[Comment] = std::bind(handleComment, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    // Функциональные привязки к массиву, где номер состояния - индекс элемента массива
+    // Предоставляет удобство при выборе очередного обработчика соятояния
+
+    m_stateHandlers[Start] = std::bind(handleStart, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[Id] = std::bind(handleId, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[IdEnding] = std::bind(handleIdEnding, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[Code] = std::bind(handleCode, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[CodeWaiting] = std::bind(handleCodeWaiting, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[ArgWaiting] = std::bind(handleArgWaiting, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[Arg] = std::bind(handleArg, this, std::placeholders::_1, std::placeholders::_2);
+    m_stateHandlers[Comment] = std::bind(handleComment, this, std::placeholders::_1, std::placeholders::_2);
 }
 
-CommandData AssemblerParser::parseLine(const std::string &line, bool *hasError)
+CommandData AssemblerParser::parseLine(const std::string &line)
 {
-    CommandData result;
+    CommandData result; // Результат парсинга строки
     result.lineIndex = m_currentLineIndex;
     result.sourceLine = line;
 
-    m_currentState = Start;
+    m_currentState = Start; // Start - всегда первое состояние
     m_currentSymbolIndex = 0;
 
+    // Читаем пока не конец строки и состояние не End
     while(m_currentSymbolIndex < line.size() + 1 && m_currentState != End)
     {
-        char symbol = line[m_currentSymbolIndex];
-        m_currentState = m_stateHandlers[m_currentState](symbol, result, hasError);
+        try
+        {
+            char symbol = line[m_currentSymbolIndex]; // Берем очередной символ
+            m_currentState = m_stateHandlers[m_currentState](symbol, result); // Применяем нужные обработчик
 
-        ++m_currentSymbolIndex;
+            ++m_currentSymbolIndex;
+        }
+        catch(TranslationException &ex)
+        {
+            saveErrorData(result, ex.translationError().errorCode()); // Сохраняем ошибку
+            m_currentState = End; // После ошибки состояние в End
+
+            throw; // Выбрасываем наверх
+        }
     }
 
     return result;
@@ -113,7 +129,7 @@ AssemblerParser::SymbolType AssemblerParser::getSymbolType(char symbol) const
     return Unknown;
 }
 
-AssemblerParser::State AssemblerParser::handleStart(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleStart(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -122,8 +138,7 @@ AssemblerParser::State AssemblerParser::handleStart(char symbol, CommandData &cm
         case Unknown: // Первый символ неверен
         case Colon:
         case Digit:
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
             return End;
 
         case CommentSeparator: // Строка начинается с комментария. Переходим к сбору комментария
@@ -141,12 +156,11 @@ AssemblerParser::State AssemblerParser::handleStart(char symbol, CommandData &cm
             return Id;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleId(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleId(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -170,8 +184,7 @@ AssemblerParser::State AssemblerParser::handleId(char symbol, CommandData &cmdDa
             return Comment; // Переходим к сбору комментария
 
         case Unknown: // Встретили символ, который не может быть в названии идентификатора
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
 
         case LineEnd: // Конец строки, значит собрали код
             cmdData.code = cmdData.label;
@@ -179,12 +192,11 @@ AssemblerParser::State AssemblerParser::handleId(char symbol, CommandData &cmdDa
             return End;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleIdEnding(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleIdEnding(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -216,12 +228,11 @@ AssemblerParser::State AssemblerParser::handleIdEnding(char symbol, CommandData 
             return End;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleCodeWaiting(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleCodeWaiting(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -230,8 +241,7 @@ AssemblerParser::State AssemblerParser::handleCodeWaiting(char symbol, CommandDa
         case Unknown: // Встретили символ, который не может содержаться в коде
         case Colon:
         case Digit:
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
 
         case LineEnd: // Встретили конец строки. На строке была только метка
             return End;
@@ -248,12 +258,11 @@ AssemblerParser::State AssemblerParser::handleCodeWaiting(char symbol, CommandDa
             return m_currentState;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleCode(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleCode(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -261,8 +270,7 @@ AssemblerParser::State AssemblerParser::handleCode(char symbol, CommandData &cmd
     {
         case Unknown: // Встретили символ, который не может содержаться в коде
         case Colon:
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
 
         case LineEnd: // Встретили конец строки, собрали код
             return End;
@@ -280,12 +288,11 @@ AssemblerParser::State AssemblerParser::handleCode(char symbol, CommandData &cmd
             return ArgWaiting;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleArgWaiting(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleArgWaiting(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -302,8 +309,7 @@ AssemblerParser::State AssemblerParser::handleArgWaiting(char symbol, CommandDat
             return m_currentState;
 
         case Colon: // Символ ":" не может содержаться в аргументе
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
 
         case LineEnd: // Конец строки. Команда без аргумента
             return End;
@@ -312,12 +318,11 @@ AssemblerParser::State AssemblerParser::handleArgWaiting(char symbol, CommandDat
             return Comment; // Переходим к сбору аргумента
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleArg(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleArg(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -335,19 +340,17 @@ AssemblerParser::State AssemblerParser::handleArg(char symbol, CommandData &cmdD
             return Comment; // Переходм к сбору комментария
 
         case Colon: // Встретили недопустимый для аргумента символ ":".
-            *hasError = true;
-            saveErrorData(cmdData, CompillerError::IncorrectSymbol);
+            throwTranslationException(CompillerError::IncorrectSymbol);
 
         case LineEnd: // Встретили конец строки. Закончили сбор аргмента
             return End;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
-AssemblerParser::State AssemblerParser::handleComment(char symbol, CommandData &cmdData, bool *hasError) const
+AssemblerParser::State AssemblerParser::handleComment(char symbol, CommandData &cmdData) const
 {
     SymbolType symbolType = getSymbolType(symbol);
 
@@ -367,12 +370,16 @@ AssemblerParser::State AssemblerParser::handleComment(char symbol, CommandData &
             return End;
     }
 
-    *hasError = true;
-    saveErrorData(cmdData, CompillerError::Unknown);
+    throwTranslationException(CompillerError::Unknown);
     return End;
 }
 
 void AssemblerParser::saveErrorData(CommandData &cmdData, CompillerError errorCode) const
 {
     cmdData.errors.add(cmdData, errorCode);
+}
+
+void AssemblerParser::throwTranslationException(CompillerError errorCode) const
+{
+    throw TranslationException(0, std::string(), errorCode);
 }

@@ -10,7 +10,7 @@ typedef std::vector<Address> RelativesTable;
  * Структура:
  * [IP] - 2 БАЙТА
  * [Количество записей в таблице] - 4 байта
- * [Таблица (адреса последовательнт)] - Каждый адрес 2 байта
+ * [Таблица (адреса последовательно)] - Каждый адрес 2 байта
  * [Код] - до конца файла
  */
 
@@ -40,6 +40,11 @@ private:
     ByteArray m_programBytes; // Машинный код программы
 
     bool m_ipIsSet; // Определяет, установлен ли IP
+
+    void writeIp(std::ostream &s); // Записывает IP в выходной файл
+    void writeTableSize(std::ostream &s);
+    void writeTable(std::ostream &s);
+    void writeProgramBytes(std::ostream &s);
 };
 
 #endif //VMEXECUTABLE_H

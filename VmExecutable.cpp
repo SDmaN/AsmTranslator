@@ -26,6 +26,7 @@ void VmExecutable::appendRelativeAddress(Address relative)
 
 void VmExecutable::appendBytes(const ByteArray &bytes)
 {
+    // Вставляем в конец вектора дополнительные байты
     m_programBytes.insert(std::end(m_programBytes), std::begin(bytes), std::end(bytes));
 }
 
@@ -49,16 +50,33 @@ bool VmExecutable::ipIsSet() const
 
 void VmExecutable::write(std::ostream &s)
 {
-    s.write(reinterpret_cast<char *>(&m_ip), sizeof(m_ip)); // Сначала IP
+    writeIp(s); // Сначала IP, 2 байта
+    writeTableSize(s); // Размер таблицы, 4 байта
+    writeTable(s); // Таблица адресов. n * 2 байт (n - количество записей в таблице)
+    writeProgramBytes(s); // Байты программы
+}
 
-    std::size_t relativeTableSize = m_relativesTable.size();
-    s.write(reinterpret_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
-
-    for(Address address : m_relativesTable)
-        s.write(reinterpret_cast<char *>(&address), sizeof(address));
-
+void VmExecutable::writeProgramBytes(std::ostream &s)
+{
     for(Byte b : m_programBytes)
         s.write(&b, sizeof(b));
+}
+
+void VmExecutable::writeTable(std::ostream &s)
+{
+    for(Address address : m_relativesTable)
+        s.write(reinterpret_cast<char *>(&address), sizeof(address));
+}
+
+void VmExecutable::writeTableSize(std::ostream &s)
+{
+    std::size_t relativeTableSize = m_relativesTable.size();
+    s.write(reinterpret_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
+}
+
+void VmExecutable::writeIp(std::ostream &s)
+{
+    s.write(reinterpret_cast<char *>(&m_ip), sizeof(m_ip));
 }
 
 void VmExecutable::write(const std::string &fileName)

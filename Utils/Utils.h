@@ -4,11 +4,12 @@
 #include "../TypeDefines.h"
 
 // Преобразователь к массиву байт
-template<typename T>
+// CastingItemType - тип преобразуемого объекта
+template<typename CastingItemType>
 union ByteConverter
 {
-    T convertingItem;
-    Byte bytes[sizeof(T)];
+    CastingItemType convertingItem; // Преобразуемый объект
+    Byte bytes[sizeof(CastingItemType)]; // Байты объекта
 };
 
 // Преобразует объект к массиву байт
