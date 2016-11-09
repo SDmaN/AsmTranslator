@@ -64,7 +64,7 @@ private:
     State m_currentState; // Текущее состояние
 
     void initHandlers(); // Инициализирует функции-обработчики
-    CommandData parseLine(const std::string &line); // Парсит исходную строку
+    void parseLine(const std::string &line, CommandData &cmdData); // Парсит исходную строку
 
     SymbolType getSymbolType(char symbol) const; // Возвращает тип символа
 

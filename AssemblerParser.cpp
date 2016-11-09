@@ -20,11 +20,12 @@ std::vector<CommandData> AssemblerParser::parse(std::istream &stream, bool *hasE
 
     while(!stream.eof())
     {
+        CommandData cmdData; // Разобранные данные команды из исходной строки
+
         try
         {
             std::getline(stream, line); // Считываем очередную строку
-            CommandData cmdData = parseLine(line); // Разбиваем ее
-            result.push_back(cmdData); // Сохраняем результат
+            parseLine(line, cmdData); // Разбиваем ее
         }
         catch(TranslationException &ex)
         {
@@ -32,7 +33,8 @@ std::vector<CommandData> AssemblerParser::parse(std::istream &stream, bool *hasE
                 *hasErrors = true;
         }
 
-        ++m_currentLineIndex;
+        result.push_back(cmdData); // Сохраняем результат независимо от ошибки
+        ++m_currentLineIndex; // Переходим к следующей линии
     }
 
     return result;
@@ -69,11 +71,10 @@ void AssemblerParser::initHandlers()
     m_stateHandlers[Comment] = std::bind(handleComment, this, std::placeholders::_1, std::placeholders::_2);
 }
 
-CommandData AssemblerParser::parseLine(const std::string &line)
+void AssemblerParser::parseLine(const std::string &line, CommandData &cmdData)
 {
-    CommandData result; // Результат парсинга строки
-    result.lineIndex = m_currentLineIndex;
-    result.sourceLine = line;
+    cmdData.lineIndex = m_currentLineIndex; // Сохраняем номер строки
+    cmdData.sourceLine = line; // Сохрнаяем исходную строку
 
     m_currentState = Start; // Start - всегда первое состояние
     m_currentSymbolIndex = 0;
@@ -84,20 +85,18 @@ CommandData AssemblerParser::parseLine(const std::string &line)
         try
         {
             char symbol = line[m_currentSymbolIndex]; // Берем очередной символ
-            m_currentState = m_stateHandlers[m_currentState](symbol, result); // Применяем нужные обработчик
+            m_currentState = m_stateHandlers[m_currentState](symbol, cmdData); // Применяем нужные обработчик
 
             ++m_currentSymbolIndex;
         }
         catch(TranslationException &ex)
         {
-            saveErrorData(result, ex.translationError().errorCode()); // Сохраняем ошибку
+            saveErrorData(cmdData, ex.translationError().errorCode()); // Сохраняем ошибку
             m_currentState = End; // После ошибки состояние в End
 
             throw; // Выбрасываем наверх
         }
     }
-
-    return result;
 }
 
 AssemblerParser::SymbolType AssemblerParser::getSymbolType(char symbol) const
