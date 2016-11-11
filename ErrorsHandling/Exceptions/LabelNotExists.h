@@ -1,0 +1,13 @@
+//
+// Created by sdman on 11.11.2016.
+//
+
+#ifndef ASMTRANSLATOR_LABELNOTEXISTS_H
+#define ASMTRANSLATOR_LABELNOTEXISTS_H
+
+class LabelNotExists
+{
+
+};
+
+#endif //ASMTRANSLATOR_LABELNOTEXISTS_H

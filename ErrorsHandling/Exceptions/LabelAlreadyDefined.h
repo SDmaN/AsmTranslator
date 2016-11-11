@@ -1,0 +1,13 @@
+//
+// Created by sdman on 11.11.2016.
+//
+
+#ifndef ASMTRANSLATOR_LABELALREADYDEFINED_H
+#define ASMTRANSLATOR_LABELALREADYDEFINED_H
+
+class LabelAlreadyDefined
+{
+
+};
+
+#endif //ASMTRANSLATOR_LABELALREADYDEFINED_H
