@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <string>
+#include <algorithm>
 #include "../TypeDefines.h"
 
 // Преобразователь к массиву байт
@@ -22,5 +24,8 @@ ByteArray toBytes(const CastingItemType &item)
 
     return ByteArray(std::begin(converter.bytes), std::end(converter.bytes));
 }
+
+// Удаляет пробелы из строки
+void removeSpaces(std::string &s);
 
 #endif //UTILS_H

@@ -12,11 +12,14 @@ VmExecutable AssemblerTranslator::translate(const std::vector<CommandData> &cmds
 
     VmExecutable result;
 
+    // Первый проход
     bool hasError = firstPass(cmdsData);
 
+    // Если не было ошибок, второй проход
     if(!hasError)
         hasError = secondPass(result);
 
+    // Если были ошибки, vmExec должен быть пустой
     return hasError ? VmExecutable() : result;
 }
 

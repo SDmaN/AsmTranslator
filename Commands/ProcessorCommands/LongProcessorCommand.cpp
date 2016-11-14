@@ -1,4 +1,5 @@
 #include <regex>
+#include <algorithm>
 
 #include "LongProcessorCommand.h"
 #include "../LabelContainer.h"
@@ -51,7 +52,7 @@ void LongProcessorCommand::translate(VmExecutable &vmExec)
 
 void LongProcessorCommand::checkArgCorrectness() const
 {
-    const std::regex regEx("[a-zA-Z_]\\w+"); // Образец для аргумента
+    const std::regex regEx("[a-zA-Z_]\\w+\\s*"); // Образец для аргумента
 
     // Если аргумент не подходит по образцу, бросаем исключение
     if(!std::regex_match(data().arg, regEx))
@@ -61,6 +62,7 @@ void LongProcessorCommand::checkArgCorrectness() const
 Address LongProcessorCommand::getArgAddress() const
 {
     std::string arg = data().arg;
+    removeSpaces(arg); // Удаляем пробелы из строки
 
     // Если метка указывает на адрес, выбрасываем ArgumentIncorrect
     // Если в данном месте, метка не будет найдена, будет выброшено LabelNotExists

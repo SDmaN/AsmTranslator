@@ -3,6 +3,7 @@
 #include "../LabelContainer.h"
 #include "../../ErrorsHandling/Exceptions/ArgumentIncorrectException.h"
 #include "../../ErrorsHandling/Exceptions/LabelNotExistsException.h"
+#include "../../Utils/Utils.h"
 
 EndCommand::EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
         : Command(data, commandAddress, labelContainer)
@@ -49,7 +50,7 @@ void EndCommand::parseArg()
 
 void EndCommand::checkArgCorrectness() const
 {
-    const std::regex regEx("[a-zA-Z_]\\w+"); // Образец для аргумента
+    const std::regex regEx("[a-zA-Z_]\\w+\\s*"); // Образец для аргумента
 
     // Если аргумент не подходит по образцу, бросаем исключение
     if(!std::regex_match(data().arg, regEx))
@@ -59,6 +60,7 @@ void EndCommand::checkArgCorrectness() const
 Address EndCommand::getArgAddress() const
 {
     std::string arg = data().arg;
+    removeSpaces(arg); // Удаляем пробелы
 
     // Если метка указывает на адрес, выбрасываем ArgumentIncorrect
     // Если в данном месте, метка не будет найдена, будет выброшено LabelNotExists

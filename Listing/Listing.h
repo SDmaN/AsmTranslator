@@ -14,13 +14,14 @@ class Listing
 {
 public:
     void clear(); // Очищает листинг
-    void generate(const std::vector<CommandPointer> &commands);
+    void generate(const std::vector<CommandPointer> &commands); // Формирует листинг на основе команд
 
+    // Вывод листинга в поток
     friend std::ostream &operator<<(std::ostream &stream, const Listing &listing);
 
 private:
-    std::string m_listingText;
-    void appendLine(const CommandPointer &command);
+    std::string m_listingText; // Текст листинга
+    void appendLine(const CommandPointer &command); // Добавляет очередную строку (команду) к листингу
 };
 
 #endif //LISTINGMAKER_H
