@@ -41,6 +41,8 @@ public:
     void addWord(const std::string &label, Word word); // Добавляет знаковую константу
     Word word(const std::string &label) const; // Возвращает знаковую константу
 
+    LabelData::Purpose labelPurpose(const std::string &label); // Возвращает назначение мекти
+
     // Изменяет назначение метки
     void updateLabel(const std::string &label, LabelData::Purpose newPurpose);
 
@@ -51,8 +53,8 @@ private:
 
     void insertLabelData(const std::string &label, const LabelData &labelData); // Добавляет метку в таблицу
 
-    void throwAlreadyDefinedException(const std::string &label) const; // Выбрасывает исключение LabelAlreadyDefined
-    void throwNotExistsException(const std::string &label) const; // Выбрасывает иключение LabelNotExists
+    void throwAlreadyDefinedException(const std::string &label) const; // Выбрасывает исключение LabelAlreadyDefinedException
+    void throwNotExistsException(const std::string &label) const; // Выбрасывает иключение LabelNotExistsException
 
     void checkNotDefined(const std::string &label) const; // Выбрасывает исключение, если метка не определена
     void checkExists(const std::string &label) const; // Выбрасывает исключение, если метки нет в таблице

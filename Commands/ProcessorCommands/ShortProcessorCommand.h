@@ -2,9 +2,8 @@
 #define SHORTPROCESSORCOMMAND_H
 
 #include "ProcessorCommand.h"
-#include "../LabelCommand.h"
 
-// Короткая команда процессора
+// Короткая команда процессора (1 байт)
 class ShortProcessorCommand : public ProcessorCommand
 {
 public:
@@ -15,7 +14,6 @@ public:
 
 private:
     const std::size_t ShortCommandSize = 1; // Размер в байтах
-    LabelCommand m_labelCommand;
 };
 
 #endif //SHORTPROCESSORCOMMAND_H

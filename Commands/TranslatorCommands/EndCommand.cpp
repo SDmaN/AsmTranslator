@@ -1,65 +1,70 @@
 #include <regex>
 #include "EndCommand.h"
 #include "../LabelContainer.h"
+#include "../../ErrorsHandling/Exceptions/ArgumentIncorrectException.h"
+#include "../../ErrorsHandling/Exceptions/LabelNotExistsException.h"
 
 EndCommand::EndCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
-        : Command(data, commandAddress, labelContainer),
-          m_labelCommand(data, commandAddress, labelContainer)
+        : Command(data, commandAddress, labelContainer)
 {
     parseArg();
 }
 
 size_t EndCommand::size() const
 {
-    return m_commandSize;
+    return EndComandSize;
 }
 
 void EndCommand::translate(VmExecutable &vmExec)
 {
-    m_labelCommand.translate(vmExec);
-    ByteArray result;
-
+    // Если нет ошибок, устанавливаем ip
     if(!hasError())
-    {
-        result = { static_cast<Byte>(m_stopCommandCode) };
+        vmExec.setIp(m_ip); // Директива устанавливает ip
 
-        vmExec.setIp(m_ip);
-        vmExec.appendBytes(result);
-        vmExec.appendRelativeAddress(address() + sizeof(m_stopCommandCode));
-    }
-
-    setTranslatedBytes(result);
+    // Результат трансляции - пустой
+    setTranslatedBytes(ByteArray());
 }
 
 void EndCommand::parseArg()
 {
-    if(!checkArgCorrectness())
+    // Если не было ошибки
+    if(!hasError())
     {
-        handleError(CompillerError::ArgumentIncorrect);
-        return;
+        try
+        {
+            checkArgCorrectness(); // Проверили корректность аргумента. Есть вариант перехватить исключение
+            Address argAddres = getArgAddress(); // Получили адрес. Есть вариант перехватить исключение
+            m_ip = argAddres; // Сохранили ip
+        }
+        catch(ArgumentIncorrectException &ex) // Некорректность аргумента
+        {
+            handleError(CompillerError::ArgumentIncorrect);
+        }
+        catch(LabelNotExistsException &ex) // Не найдена метка, переданная в аргумент
+        {
+            handleError(CompillerError::LabelNotFound);
+        }
     }
-
-    else if(!labelExists())
-    {
-        handleError(CompillerError::LabelNotFound);
-        return;
-    }
-
-    m_ip = getArgAddress();
 }
 
-bool EndCommand::checkArgCorrectness() const
+void EndCommand::checkArgCorrectness() const
 {
-    const std::regex regEx("[a-zA-Z_]\\w+");
-    return std::regex_match(data().arg, regEx);
-}
+    const std::regex regEx("[a-zA-Z_]\\w+"); // Образец для аргумента
 
-bool EndCommand::labelExists() const
-{
-    return labelContainer()->contains(data().arg);
+    // Если аргумент не подходит по образцу, бросаем исключение
+    if(!std::regex_match(data().arg, regEx))
+        throw ArgumentIncorrectException(data().arg);
 }
 
 Address EndCommand::getArgAddress() const
 {
-    return labelContainer()->address(data().arg);
+    std::string arg = data().arg;
+
+    // Если метка указывает на адрес, выбрасываем ArgumentIncorrect
+    // Если в данном месте, метка не будет найдена, будет выброшено LabelNotExists
+    if(labelContainer()->labelPurpose(arg) != LabelData::AddressConstant)
+        throw ArgumentIncorrectException(arg);
+
+    // Если метку нашли и она указывает на адрес, то возвращаем адрес
+    return labelContainer()->address(arg);
 }

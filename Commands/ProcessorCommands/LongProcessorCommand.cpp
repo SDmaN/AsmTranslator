@@ -2,11 +2,12 @@
 
 #include "LongProcessorCommand.h"
 #include "../LabelContainer.h"
+#include "../../ErrorsHandling/Exceptions/ArgumentIncorrectException.h"
+#include "../../ErrorsHandling/Exceptions/LabelNotExistsException.h"
 #include "../../Utils/Utils.h"
 
 LongProcessorCommand::LongProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
-        : ProcessorCommand(data, commandAddress, labelContainer),
-          m_labelCommand(data, commandAddress, labelContainer)
+        : ProcessorCommand(data, commandAddress, labelContainer)
 {
 }
 
@@ -17,46 +18,55 @@ size_t LongProcessorCommand::size() const
 
 void LongProcessorCommand::translate(VmExecutable &vmExec)
 {
-    m_labelCommand.translate(vmExec);
-    ByteArray result;
+    ByteArray result; // Результат трансляции
 
+    // Если нет ошибок
     if(!hasError())
     {
-        if(!checkArgCorrectness())
-            handleError(CompillerError::ArgumentIncorrect);
-
-        else if(!labelExists())
-            handleError(CompillerError::LabelNotFound);
-
-        else
+        try
         {
-            Address argAddress = getArgAddress();
-            ByteArray addressBytes = toBytes(argAddress);
+            checkArgCorrectness(); // Проверили корректность аргумента. Есть вариант перехватить исключение
+            Address argAddres = getArgAddress(); // Получили адрес. Есть вариант перехватить исключение
+            ByteArray addressBytes = toBytes(argAddres); // Байты адреса
 
             result.reserve(LongCommandSize);
             result.push_back(static_cast<Byte>(code())); // Байт кода операции
             result.insert(std::end(result), std::begin(addressBytes), std::end(addressBytes)); // Дописываем 2 байта адреса
 
-            vmExec.appendBytes(result);
-            vmExec.appendRelativeAddress(address() + sizeof(code())); // Адрес аргумента сразу после кода
+            vmExec.appendBytes(result); // Дописали байта к executable
+            vmExec.appendRelativeAddress(address() + sizeof(code())); // Занесли адрес в таблицу
+        }
+        catch(ArgumentIncorrectException &ex) // Некорректность аргумента
+        {
+            handleError(CompillerError::ArgumentIncorrect);
+        }
+        catch(LabelNotExistsException &ex) // Не найдена метка, переданная в аргумент
+        {
+            handleError(CompillerError::LabelNotFound);
         }
     }
 
     setTranslatedBytes(result);
 }
 
-bool LongProcessorCommand::checkArgCorrectness() const
+void LongProcessorCommand::checkArgCorrectness() const
 {
-    const std::regex regEx("[a-zA-Z_]\\w+");
-    return std::regex_match(data().arg, regEx);
-}
+    const std::regex regEx("[a-zA-Z_]\\w+"); // Образец для аргумента
 
-bool LongProcessorCommand::labelExists() const
-{
-    return labelContainer()->contains(data().arg);
+    // Если аргумент не подходит по образцу, бросаем исключение
+    if(!std::regex_match(data().arg, regEx))
+        throw ArgumentIncorrectException(data().arg);
 }
 
 Address LongProcessorCommand::getArgAddress() const
 {
-    return labelContainer()->address(data().arg);
+    std::string arg = data().arg;
+
+    // Если метка указывает на адрес, выбрасываем ArgumentIncorrect
+    // Если в данном месте, метка не будет найдена, будет выброшено LabelNotExists
+    if(labelContainer()->labelPurpose(arg) != LabelData::AddressConstant)
+        throw ArgumentIncorrectException(arg);
+
+    // Если метку нашли и она указывает на адрес, то возвращаем адрес
+    return labelContainer()->address(arg);
 }

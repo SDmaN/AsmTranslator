@@ -5,10 +5,10 @@
 #include <string>
 
 // Ошибка параметра командной строки
-class CommandLineParameterNotExists : public std::exception
+class CommandLineParameterNotExistsException : public std::exception
 {
 public:
-    CommandLineParameterNotExists(const std::string &message);
+    CommandLineParameterNotExistsException(const std::string &message);
     virtual const char *what() const throw() override; // Сообщение ошибки
 
 private:

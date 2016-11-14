@@ -8,7 +8,6 @@ CommandFactory<AllocateCommand<Dword>> CommandsCreator::m_dwAllocateCommandFacto
 CommandFactory<AllocateCommand<Float>> CommandsCreator::m_fltAllocateCommandFactory;
 CommandFactory<EndCommand> CommandsCreator::m_endCommandFactory;
 CommandFactory<UnknownCommand> CommandsCreator::m_unknownCommandFactory;
-CommandFactory<LabelCommand> CommandsCreator::m_labelCommandFactory;
 CommandFactory<EmptyCommand> CommandsCreator::m_emptyCommandFactory;
 
 // Словарь с фабриками
@@ -82,16 +81,15 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
 CommandPointer
 CommandsCreator::create(const CommandData &cmdData, Address commandAddress, LabelContainer *labelContainer) const
 {
-    if(cmdData.label.empty() && cmdData.code.empty() && cmdData.arg.empty())
+    if(cmdData.code.empty() && cmdData.arg.empty()) // Если есть только метка, создаем пустую команду
         return m_emptyCommandFactory.create(cmdData, commandAddress, labelContainer);
-
-    if(cmdData.code.empty() && !cmdData.label.empty())
-        return m_labelCommandFactory.create(cmdData, commandAddress, labelContainer);
 
     auto factoriesIt = m_commandFactories.find(cmdData.code);
 
+    // Если не нашли нужную команду среди фабрик, создаем ошибочную команду
     if(factoriesIt == std::end(m_commandFactories))
         return m_unknownCommandFactory.create(cmdData, commandAddress, labelContainer);
 
+    // Иначе создаем команду по найденной фабрике
     return factoriesIt->second->create(cmdData, commandAddress, labelContainer);
 }

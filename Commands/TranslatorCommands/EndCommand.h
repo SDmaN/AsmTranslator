@@ -2,7 +2,6 @@
 #define ENDCOMMAND_H
 
 #include "../Command.h"
-#include "../LabelCommand.h"
 
 // Команда транслятора End
 class EndCommand : public Command
@@ -14,18 +13,13 @@ public:
     virtual void translate(VmExecutable &vmExec) override; // Транслирует команду (вставляет Stop)
 
 private:
-    const std::size_t m_commandSize = 1; // Размер Stop
-    const ProcessorCommandCode m_stopCommandCode = ProcessorCommandCode::Stop;
-
-    Address m_ip;
-
-    LabelCommand m_labelCommand;
+    const std::size_t EndComandSize = 0; // Размер директивы
+    Address m_ip; // Адрес старта программы
 
     void parseArg(); // Парсит аргумент
 
-    bool checkArgCorrectness() const; // Проверяет аргумент на правильность
-    bool labelExists() const; // Проверяет, существует ли метка (из аргумента)
-    Address getArgAddress() const; // Возвращает адрес метки
+    void checkArgCorrectness() const; // Проверяет аргумент на правильность
+    Address getArgAddress() const; // Возвращает адрес метки. Если метка указывает на константу, выбрасывает ArgumentIncorrect
 };
 
 #endif //ENDCOMMAND_H

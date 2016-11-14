@@ -1,6 +1,6 @@
 #include "LabelContainer.h"
-#include "../ErrorsHandling/Exceptions/LabelAlreadyDefined.h"
-#include "../ErrorsHandling/Exceptions/LabelNotExists.h"
+#include "../ErrorsHandling/Exceptions/LabelAlreadyDefinedException.h"
+#include "../ErrorsHandling/Exceptions/LabelNotExistsException.h"
 
 bool LabelContainer::contains(const std::string &label) const
 {
@@ -56,6 +56,14 @@ Word LabelContainer::word(const std::string &label) const
     return ld.taggedData.w;
 }
 
+LabelData::Purpose LabelContainer::labelPurpose(const std::string &label)
+{
+    checkExists(label); // Проверяем наличие
+
+    LabelData ld = m_container.at(label);
+    return ld.purpose; // Возвращаем назначение
+}
+
 void LabelContainer::updateLabel(const std::string &label, LabelData::Purpose newPurpose)
 {
     checkExists(label); // Проверяем наличие
@@ -76,12 +84,12 @@ void LabelContainer::insertLabelData(const std::string &label, const LabelData &
 
 void LabelContainer::throwAlreadyDefinedException(const std::string &label) const
 {
-    throw LabelAlreadyDefined(label);
+    throw LabelAlreadyDefinedException(label);
 }
 
 void LabelContainer::throwNotExistsException(const std::string &label) const
 {
-    throw LabelNotExists(label);
+    throw LabelNotExistsException(label);
 }
 
 void LabelContainer::checkNotDefined(const std::string &label) const

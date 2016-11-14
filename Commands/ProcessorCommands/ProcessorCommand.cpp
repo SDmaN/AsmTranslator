@@ -1,5 +1,7 @@
 #include "ProcessorCommand.h"
+#include "../../ErrorsHandling/Exceptions/CommandNotFoundException.h"
 
+// "Текстовый код - числовой код короткой команды"
 std::map<std::string, ProcessorCommandCode> ProcessorCommand::m_shortCodes = {
         { "Nop",  ProcessorCommandCode::Nop },
         { "Stop", ProcessorCommandCode::Stop },
@@ -15,6 +17,7 @@ std::map<std::string, ProcessorCommandCode> ProcessorCommand::m_shortCodes = {
         { "Ret",  ProcessorCommandCode::Ret }
 };
 
+// "Текстовый код - числовой код длинной команды"
 std::map<std::string, ProcessorCommandCode> ProcessorCommand::m_longCodes = {
         { "AddI",     ProcessorCommandCode::AddI },
         { "AddIR",    ProcessorCommandCode::AddIR },
@@ -70,7 +73,7 @@ std::map<std::string, ProcessorCommandCode> ProcessorCommand::m_longCodes = {
 ProcessorCommand::ProcessorCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
         : Command(data, commandAddress, labelContainer)
 {
-    extractCode(data);
+    extractCode(data); // При создании команды сразу можем определить ее код
 }
 
 ProcessorCommandCode ProcessorCommand::code() const
@@ -80,17 +83,34 @@ ProcessorCommandCode ProcessorCommand::code() const
 
 void ProcessorCommand::extractCode(const CommandData &cmdData)
 {
-    auto shortIt = m_shortCodes.find(cmdData.code);
-
-    if(shortIt == std::end(m_shortCodes))
+    try
     {
-        auto longIt = m_longCodes.find(cmdData.code);
-
-        if(longIt == std::end(m_longCodes))
-            handleError(CompillerError::CommandNotFound);
-        else
-            m_code = longIt->second;
+        findCommand(cmdData, m_shortCodes); // Сперва ищем среди коротких
     }
-    else
-        m_code = shortIt->second;
+    catch(CommandNotFoundException &ex)
+    {
+        try
+        {
+            // Если не найшли, пытаемся искать среди длинных
+            findCommand(cmdData, m_longCodes);
+        }
+        catch(CommandNotFoundException &ex)
+        {
+            // Если опять не нашли, то ошибка
+            handleError(CompillerError::CommandNotFound);
+        }
+    }
+}
+
+void
+ProcessorCommand::findCommand(const CommandData &cmdData, std::map<std::string, ProcessorCommandCode> &whereToSearch)
+{
+    auto it = whereToSearch.find(cmdData.code); // Ищем код
+
+    // Если не нашли, выбрасываем исключение
+    if(it == std::end(whereToSearch))
+        throw CommandNotFoundException(cmdData.code);
+
+    // Иначе устанавливаем код
+    m_code = it->second;
 }

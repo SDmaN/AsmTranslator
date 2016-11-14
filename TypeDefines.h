@@ -6,6 +6,8 @@
 typedef char Byte;
 typedef unsigned char uByte;
 typedef unsigned short Address;
+typedef short Word;
+typedef unsigned short uWord;
 typedef int Dword;
 typedef float Float;
 

@@ -5,7 +5,6 @@
 #include <iterator>
 
 #include "../Command.h"
-#include "../LabelCommand.h"
 #include "../../Utils/Utils.h"
 
 // Директива для выделения памяти
@@ -15,8 +14,7 @@ class AllocateCommand : public Command
 {
 public:
     AllocateCommand(const CommandData &data, Address commandAddress, LabelContainer *labelContainer)
-            : Command(data, commandAddress, labelContainer),
-              m_labelCommand(data, commandAddress, labelContainer)
+            : Command(data, commandAddress, labelContainer)
     {
         parseArg(data.arg);
     }
@@ -31,7 +29,8 @@ public:
     // Если выделяется массив, то он заполняется нулями
     virtual void translate(VmExecutable &vmExec) override
     {
-        m_labelCommand.translate(vmExec);
+        if(hasError())
+            return;
 
         ByteArray result;
 
@@ -71,29 +70,28 @@ private:
     std::vector<AllocatingItemType> m_allocatingItems; // Выделяемые элементы (используется только для последовательности)
     ArgType m_argType; // Тип аргумента
 
-    LabelCommand m_labelCommand;
-
     // Парсит аргумент, вычисляя го тип
     void parseArg(const std::string &arg)
     {
         m_argType = getArgType(arg);
 
+        // Проверяем тип аргумента
         switch(m_argType)
         {
-            case ArgType::Unknown:
+            case ArgType::Unknown: // Неизвестный - сохраняем ошибку
                 handleError(CompillerError::ArgumentIncorrect);
                 return;
 
-            case ArgType::Empty:
+            case ArgType::Empty: // Пустой - сохраняем ошибку
                 handleError(CompillerError::TooFewArguments);
                 return;
 
-            case ArgType::Array:
-                parseArray(arg);
+            case ArgType::Array: // В виде массива ([n])
+                parseArray(arg); // Парсим как массив
                 break;
 
-            case ArgType::Sequence:
-                parseSequence(arg);
+            case ArgType::Sequence: // Последовательность (a, b, c, ...)
+                parseSequence(arg); // Парсим как последовательность
                 break;
         }
     }
@@ -123,8 +121,8 @@ private:
     // Проверяет аргумент на последовательность
     bool checkSequence(const std::string &arg)
     {
-        std::string np = numberPattern();
-        std::string sequencePattern = "\\s*" + np + "\\s*(\\,\\s*" + np + ")*\\s*";
+        std::string np = numberPattern(); // Получаем образец для числа (для целого и дробного разные)
+        std::string sequencePattern = "\\s*" + np + "\\s*(\\,\\s*" + np + ")*\\s*"; // Паттерн для последовательности
         std::regex sequenceRegex(sequencePattern);
 
         return std::regex_match(arg, sequenceRegex);

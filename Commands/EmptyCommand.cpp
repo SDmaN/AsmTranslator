@@ -5,11 +5,13 @@ EmptyCommand::EmptyCommand(const CommandData &data, Address commandAddress, Labe
 {
 }
 
-size_t EmptyCommand::size() const
+std::size_t EmptyCommand::size() const
 {
-    return 0;
+    return EmptyCommandSize;
 }
 
 void EmptyCommand::translate(VmExecutable &vmExec)
 {
+    // Устанавливаем пустые байты
+    setTranslatedBytes(ByteArray());
 }
