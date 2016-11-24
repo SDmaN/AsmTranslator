@@ -6,6 +6,8 @@
 #include "MathExpressionCalculator.h"
 #include "Utils.h"
 #include "../ErrorsHandling/Exceptions/ArgumentIncorrectException.h"
+#include "../ErrorsHandling/Exceptions/LabelNotExistsException.h"
+#include "../Commands/LabelContainer.h"
 
 MathExpressionCalculator::MathExpressionCalculator(LabelContainer *labelContainer, Address placingCounter)
         : m_labelContainer(labelContainer), m_placingCounter(placingCounter)
@@ -391,7 +393,16 @@ void MathExpressionCalculator::val(int &value, int &sign)
     switch(m_tokenType)
     {
         case Name:
+        {
+            if(m_labelContainer == nullptr)
+            {
+                throw LabelNotExistsException(m_token);
+            }
+
+            value = m_labelContainer->word(m_token);
+
             break;
+        }
 
         case DecimalConstant:
         {
