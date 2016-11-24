@@ -46,6 +46,9 @@ public:
     // Изменяет назначение метки
     void updateLabel(const std::string &label, LabelData::Purpose newPurpose);
 
+    // Опасный тип newValue
+    void updateLabel(const std::string &label, LabelData::Purpose newPurpose, unsigned short newValue);
+
     void clear(); // Очищает контейнер
 
 private:

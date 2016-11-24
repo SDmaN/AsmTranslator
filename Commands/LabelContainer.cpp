@@ -32,6 +32,10 @@ Address LabelContainer::address(const std::string &label) const
 
     // Метка есть
     LabelData ld = m_container.at(label);
+
+    if(ld.purpose != LabelData::AddressConstant)
+        throwNotExistsException(label);
+
     return ld.taggedData.address;
 }
 
@@ -53,6 +57,10 @@ Word LabelContainer::word(const std::string &label) const
     checkExists(label); // Проверяем наличие метки
 
     LabelData ld = m_container.at(label);
+
+    if(ld.purpose != LabelData::WordConstant)
+        throwNotExistsException(label);
+
     return ld.taggedData.w;
 }
 
@@ -70,6 +78,25 @@ void LabelContainer::updateLabel(const std::string &label, LabelData::Purpose ne
 
     //Метка есть, можем менять
     m_container[label].purpose = newPurpose;
+}
+
+void LabelContainer::updateLabel(const std::string &label, LabelData::Purpose newPurpose, unsigned short newValue)
+{
+    checkExists(label);
+
+    // Метка есть, можем менять
+    m_container[label].purpose = newPurpose;
+
+    switch(newPurpose)
+    {
+        case LabelData::Purpose::AddressConstant:
+            m_container[label].taggedData.address = newValue;
+            break;
+
+        case LabelData::Purpose::WordConstant:
+            m_container[label].taggedData.w = newValue;
+            break;
+    }
 }
 
 void LabelContainer::clear()
