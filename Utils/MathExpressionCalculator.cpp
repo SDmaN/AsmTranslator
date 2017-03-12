@@ -399,7 +399,7 @@ void MathExpressionCalculator::val(int &value, int &sign)
                 throw LabelNotExistsException(m_token);
             }
 
-            value = m_labelContainer->word(m_token);
+            value = m_labelContainer->address(m_token);
 
             break;
         }

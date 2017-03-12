@@ -12,7 +12,7 @@ class LabelContainer;
  * E->T{+T|-T}
  * T->F{*F|/F|%F}
  * F->const|name|(A)
- */
+*/
 
 // Класс для вычисления математических выражений
 class MathExpressionCalculator

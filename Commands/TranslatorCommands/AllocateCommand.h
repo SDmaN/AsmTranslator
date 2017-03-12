@@ -158,6 +158,9 @@ private:
             m_allocatingItems.push_back(static_cast<AllocatingItemType>(std::stof(match.begin()->str().c_str())));
             arg = match.suffix();
         }
+
+        m_allocatingItemsCount = m_allocatingItems.size();
+        m_commandSize = m_allocatingItemsCount * sizeof(AllocatingItemType);
     }
 
     // Транслирует аргумент как массив

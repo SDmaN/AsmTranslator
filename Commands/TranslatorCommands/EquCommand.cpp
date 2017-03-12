@@ -30,7 +30,7 @@ void EquCommand::updateLabelPurpose()
 
         // Метка уже добавлена в таблицу базовым классом
         // Нужно изменить её назначение с Address на Constant
-        labelContainer()->updateLabel(cmdData.label, LabelData::WordConstant,
+        labelContainer()->updateLabel(cmdData.label, LabelData::AddressConstant,
                                       static_cast<unsigned short>(exprCalculator.evaluate(cmdData.arg)));
     }
     catch(ArgumentIncorrectException &ex)

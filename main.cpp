@@ -1,40 +1,74 @@
 #include <iostream>
-
+#include <fstream>
 #include "AssemblerParser.h"
+#include "AssemblerTranslator.h"
+#include "ErrorsHandling/ErrorsOut.h"
+#include "Listing/Listing.h"
+#include "ErrorsHandling/Exceptions/FileNotFoundException.h"
 
 using namespace std;
 
+const string execExtension = "vmexec";
+
+string
+getExecFileName(const string &sourceFileName); // На основе исходного файла, составляет выходной (заменяет расширение)
 
 int main(int argc, char *argv[])
 {
-    return 0;
-
-
-
-    bool hasErrors;
-
-    AssemblerParser parser;
-    auto parsed = parser.parse("123.txt", &hasErrors);
-
-    cout << "has errors: " << hasErrors << endl << endl;
-
-    for(auto &x : parsed)
+    if(argc >= 2)
     {
-        cout << x.lineIndex << ":" << endl;
-        cout << "source: " << x.sourceLine << endl;
-        cout << "label: " << x.label << endl;
-        cout << "code: " << x.code << endl;
-        cout << "arg: " << x.arg << endl;
-        cout << "comment: " << x.comment << endl;
+        string inFilename = argv[1];
 
-        cout << "errors: " << endl;
+        try
+        {
+            AssemblerParser parser;
 
-        for(auto &e : x.errors.errors())
-            cout << e << endl;
+            auto cmdsData = parser.parse(inFilename);
 
-        cout << endl;
-        cout << endl;
+            AssemblerTranslator translator;
+            VmExecutable vmExec = translator.translate(cmdsData);
+
+            if(!vmExec.empty())
+            {
+                string execFilename = getExecFileName(inFilename);
+                vmExec.write(execFilename);
+            }
+
+            Listing listing;
+            listing.generate(translator.translatedCommands());
+
+            ofstream listtingFile("listing.txt");
+
+            if(!listtingFile.is_open())
+            {
+                throw FileNotFoundException("Не удалось открыть файл листинга");
+            }
+
+            listtingFile << listing;
+            listtingFile.close();
+
+        }
+        catch(exception &ex)
+        {
+            cout << ex.what() << endl;
+        }
+    }
+    else
+    {
+        cout << "Command argument no exist.";
     }
 
     return 0;
+}
+
+string getExecFileName(const string &sourceFileName)
+{
+    std::size_t pos = sourceFileName.find('.');
+
+    if(pos != string::npos)
+    {
+        return sourceFileName.substr(0, pos) + '.' + execExtension;
+    }
+
+    return sourceFileName + '.' + execExtension;
 }

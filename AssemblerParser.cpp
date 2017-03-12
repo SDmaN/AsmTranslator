@@ -4,11 +4,13 @@
 #include "ErrorsHandling/Exceptions/FileNotFoundException.h"
 #include "ErrorsHandling/Exceptions/TranslationException.h"
 #include "ErrorsHandling/Error.h"
+#include <iostream>
 
 const std::string FileNotFoundMessage = "Не удалось открыть исходный файл.";
 
 AssemblerParser::AssemblerParser()
 {
+
     initHandlers();
 }
 

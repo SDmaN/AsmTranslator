@@ -37,8 +37,8 @@ void Error::setErrorCode(CompillerError errorCode)
 
 std::ostream &operator<<(std::ostream &stream, const Error &error)
 {
-    stream << error.lineIndex() << ": ";
-    stream << error.sourceLine() << std::endl;
+    //stream << error.lineIndex() << ": ";
+    //stream << error.sourceLine() << std::endl;
 
     switch(error.errorCode())
     {
@@ -55,7 +55,7 @@ std::ostream &operator<<(std::ostream &stream, const Error &error)
             break;
 
         case CommandNotFound:
-            stream << "Неверный символ";
+            stream << "Неизвестная команда";
             break;
 
         case TooManyArguments:
@@ -63,7 +63,7 @@ std::ostream &operator<<(std::ostream &stream, const Error &error)
             break;
 
         case TooFewArguments:
-            stream << "Не достаточно аргументов";
+            stream << "Недостаточно аргументов";
             break;
 
         case ArgumentIncorrect:

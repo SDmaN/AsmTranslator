@@ -10,6 +10,7 @@
 #include "../ProcessorCommands/LongProcessorCommand.h"
 #include "../TranslatorCommands/AllocateCommand.h"
 #include "../TranslatorCommands/EndCommand.h"
+#include "../TranslatorCommands/EquCommand.h"
 #include "../UnknownCommand.h"
 #include "../EmptyCommand.h"
 
@@ -26,6 +27,7 @@ private:
     static CommandFactory<AllocateCommand<Dword>> m_dwAllocateCommandFactory; // Фабрика для директив выделения целых
     static CommandFactory<AllocateCommand<Float>> m_fltAllocateCommandFactory; // Фабрика для директив выделения дробных
     static CommandFactory<EndCommand> m_endCommandFactory; // Фабрика для End
+    static CommandFactory<EquCommand> m_equCommandFactory; // Фабрика для Equ
     static CommandFactory<UnknownCommand> m_unknownCommandFactory; // Фабрика для ошибочных
     static CommandFactory<EmptyCommand> m_emptyCommandFactory; // Фабрика для пустых команд (комментариев)
     static std::map<std::string, CommandFactoryBase *> m_commandFactories; // Код-фабрика

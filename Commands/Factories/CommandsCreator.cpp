@@ -6,6 +6,7 @@ CommandFactory<ShortProcessorCommand> CommandsCreator::m_shortProcessorCommandFa
 CommandFactory<LongProcessorCommand> CommandsCreator::m_longProcessorCommandFactory;
 CommandFactory<AllocateCommand<Dword>> CommandsCreator::m_dwAllocateCommandFactory;
 CommandFactory<AllocateCommand<Float>> CommandsCreator::m_fltAllocateCommandFactory;
+CommandFactory<EquCommand> CommandsCreator::m_equCommandFactory;
 CommandFactory<EndCommand> CommandsCreator::m_endCommandFactory;
 CommandFactory<UnknownCommand> CommandsCreator::m_unknownCommandFactory;
 CommandFactory<EmptyCommand> CommandsCreator::m_emptyCommandFactory;
@@ -73,7 +74,8 @@ std::map<std::string, CommandFactoryBase *> CommandsCreator::m_commandFactories 
         // Директивы
         { "AllocDword", &m_dwAllocateCommandFactory },
         { "AllocFloat", &m_fltAllocateCommandFactory },
-        { "End",        &m_endCommandFactory }
+        { "End",        &m_endCommandFactory },
+        { "Equ",        &m_equCommandFactory }
 };
 
 // ============================================

@@ -70,7 +70,7 @@ void VmExecutable::writeTable(std::ostream &s)
 
 void VmExecutable::writeTableSize(std::ostream &s)
 {
-    std::size_t relativeTableSize = m_relativesTable.size();
+    short relativeTableSize = static_cast<short>(m_relativesTable.size());
     s.write(reinterpret_cast<char *>(&relativeTableSize), sizeof(relativeTableSize));
 }
 
